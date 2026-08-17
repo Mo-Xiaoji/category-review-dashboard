@@ -1,0 +1,321 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>挡风品类预算达成分析看板</title>
+<script src="dashboard_data.js"></script>
+<style>
+:root{
+  --page:#f4f7fb;--panel:#ffffff;--panel2:#f8fbff;--ink:#111827;--sub:#475569;--line:#e5eaf2;
+  --blue:#2563eb;--blue2:#60a5fa;--navy:#102454;--green:#047857;--red:#991b1b;--amber:#f59e0b;
+  --shadow:0 14px 36px rgba(15,23,42,.08);--soft:0 6px 18px rgba(15,23,42,.06);--radius:20px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#eaf2ff 0,#f4f7fb 330px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;color:var(--ink)}
+.shell{max-width:1440px;margin:0 auto;padding:30px 36px 46px}
+.hero{position:relative;overflow:hidden;border-radius:30px;padding:32px 36px;color:#fff;background:radial-gradient(circle at 84% -10%,rgba(147,197,253,.75),transparent 34%),linear-gradient(135deg,#132a63,#2563eb 74%,#60a5fa);box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;right:-70px;bottom:-110px;width:310px;height:310px;border-radius:50%;background:rgba(255,255,255,.13)}
+.hero-top{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}h1{margin:0 0 8px;font-size:30px;letter-spacing:.2px}.hero p{margin:0;max-width:920px;line-height:1.7;opacity:.92}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:280px}.hero-tag{padding:7px 10px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(255,255,255,.14);font-size:12px;white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.toolbar{position:sticky;top:14px;z-index:20;margin:22px 0 22px;padding:18px;background:rgba(255,255,255,.95);backdrop-filter:blur(16px)}
+.toolbar-inner{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr)) auto;gap:18px;align-items:end}.field label{display:block;margin:0 0 7px 2px;color:var(--sub);font-size:12px;font-weight:650}select,button{height:42px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--ink);padding:0 12px;font-size:14px;outline:none}select{width:100%}button{font-weight:750;cursor:pointer;white-space:nowrap}button:hover{transform:translateY(-1px);filter:brightness(.99)}button.primary{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 8px 18px rgba(37,99,235,.22)}.actions{display:flex;gap:10px;justify-content:flex-end}
+.meta-line{display:flex;gap:18px 24px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);color:var(--sub);font-size:12px}.meta-line b{color:#334155}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:22px;margin-top:24px}.kpi{padding:22px}.kpi h3{margin:0;color:var(--sub);font-size:13px;font-weight:800}.value{margin:10px 0 8px;font-size:30px;font-weight:850;letter-spacing:.2px}.sub{display:flex;gap:8px 10px;flex-wrap:wrap;color:var(--sub);font-size:12px;line-height:1.7}.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:#eef4ff;color:#1d4ed8;font-size:12px;font-weight:800;white-space:nowrap}.good{background:#ecfdf3;color:var(--green)}.bad{background:#fef2f2;color:var(--red)}.warn{background:#fffbeb;color:#b45309}.progress{height:8px;background:#edf2f8;border-radius:999px;overflow:hidden;margin-top:12px}.progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#93c5fd)}
+.main-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(360px,.95fr);gap:24px;margin-top:24px}.ops-grid{display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:24px;margin-top:24px}.detail-grid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:24px}
+.card-pad{padding:24px}.head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.head h2{margin:0;font-size:19px}.hint{color:var(--sub);font-size:12px;line-height:1.65}canvas{display:block;width:100%;height:330px}.trend-card canvas{height:360px}.insights{margin:0;padding-left:20px;color:#334155;line-height:1.95;font-size:14px}.insights li{margin:6px 0}.ops-grid .card{min-height:390px}
+.table-card{margin-top:24px;padding:24px}.table-head{align-items:flex-start}.detail-controls{display:flex;flex-direction:column;align-items:flex-end;gap:10px}.head-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.head-actions select{width:auto;min-width:150px}.view-toggle{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#f8fafc}.mode-tab{border:0;border-radius:999px;padding:7px 12px;background:transparent;color:#475569;font-size:13px;font-weight:850;cursor:pointer}.mode-tab.active{background:#fff;color:var(--blue);box-shadow:var(--soft)}.tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.tab{border:1px solid var(--line);border-radius:999px;padding:7px 12px;background:#fff;color:#475569;font-size:13px;font-weight:800;cursor:pointer}.tab.active{background:#eaf1ff;border-color:#bfd5ff;color:var(--blue)}
+.table-wrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:15px;background:#fff}table{width:100%;min-width:1120px;border-collapse:separate;border-spacing:0}#amountTable.focus{min-width:1480px}#amountTable.full{min-width:2680px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:right;font-size:13px;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#f8fafc;color:#334155;font-weight:850}td:first-child,th:first-child{position:sticky;left:0;text-align:left;min-width:220px;max-width:320px;white-space:normal;line-height:1.35;background:#fff;box-shadow:8px 0 14px rgba(15,23,42,.08),1px 0 0 var(--line)}th:first-child{z-index:6;background:#f8fafc}td:first-child{z-index:4;font-weight:800}tbody tr:hover td{background:#fbfdff}tbody tr:hover td:first-child{background:#fbfdff}.cell-main{font-weight:900;color:#111827}.cell-sub{margin-top:3px;color:var(--sub);font-size:11px}.pos{color:var(--green);font-weight:850}.neg{color:var(--red);font-weight:850}.muted{color:var(--sub)}.change-stack{display:flex;flex-direction:column;gap:3px;align-items:flex-end}.small td:first-child,.small th:first-child{min-width:180px;max-width:260px}.small table{min-width:760px}.small .table-wrap{max-height:520px}
+.formula-box{margin-top:24px;padding:0;overflow:hidden}details summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:850}details summary::-webkit-details-marker{display:none}.formula{border-top:1px solid var(--line);padding:16px 18px;display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:8px 22px;color:#445066;font-size:13px;line-height:1.65;background:var(--panel2)}.foot{text-align:center;color:var(--sub);font-size:12px;padding:30px}
+#segment{display:none}
+@media(max-width:1180px){.toolbar-inner{grid-template-columns:repeat(3,1fr)}.actions{grid-column:1/-1;justify-content:flex-start}.kpis{grid-template-columns:repeat(2,1fr)}.main-grid,.ops-grid,.detail-grid{grid-template-columns:1fr}.hero-top{display:block}.hero-tags{justify-content:flex-start;margin-top:14px}}
+@media(max-width:720px){.shell{padding:18px}.toolbar-inner,.kpis{grid-template-columns:1fr}.actions{display:grid;grid-template-columns:1fr 1fr}h1{font-size:24px}.formula{grid-template-columns:1fr}}
+</style>
+<!-- unified-category-theme:start -->
+<style>
+  :root{
+    --hub-bg:#eef4fb;
+    --hub-bg-2:#f4f7fb;
+    --hub-surface:#f8fbff;
+    --hub-surface-2:#f1f6fd;
+    --hub-ink:#111827;
+    --hub-muted:#475569;
+    --hub-blue:#2563eb;
+    --hub-blue-2:#1d4ed8;
+    --hub-blue-dark:#172554;
+    --hub-line:#d6e1ef;
+    --hub-soft:#eaf2ff;
+    --hub-shadow:0 12px 30px rgba(15,23,42,.08);
+    --hub-radius:22px;
+  }
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 8% 0%,rgba(96,165,250,.16),transparent 34%),
+      radial-gradient(circle at 92% 8%,rgba(37,99,235,.10),transparent 30%),
+      linear-gradient(180deg,#e3edf8 0,#eef4fb 360px,#f4f7fb 100%)!important;
+    color:var(--hub-ink)!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
+  }
+  body a{color:var(--hub-blue);}
+
+  /* 全站顶部导航 */
+  .multipage-site-nav,.topnav{
+    position:sticky!important;top:0!important;z-index:9999!important;
+    background:rgba(248,251,255,.94)!important;backdrop-filter:blur(16px)!important;
+    border-bottom:1px solid var(--hub-line)!important;box-shadow:0 8px 24px rgba(15,23,42,.06)!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
+  }
+  .multipage-site-nav .inner,.topnav .navin{max-width:1280px!important;margin:0 auto!important;padding:10px 24px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;}
+  .multipage-site-nav .title,.topnav .brand{font-size:15px!important;font-weight:900!important;color:var(--hub-blue-dark)!important;letter-spacing:.01em!important;white-space:nowrap!important;}
+  .multipage-site-nav .links,.topnav .navlinks{display:flex!important;gap:8px!important;flex-wrap:wrap!important;}
+  .multipage-site-nav a,.topnav a{display:inline-flex!important;align-items:center!important;text-decoration:none!important;color:#334155!important;background:#fff!important;border:1px solid var(--hub-line)!important;border-radius:999px!important;padding:8px 12px!important;font-size:13px!important;line-height:1!important;font-weight:760!important;box-shadow:none!important;}
+  .multipage-site-nav a:hover,.topnav a:hover{color:var(--hub-blue)!important;background:var(--hub-soft)!important;border-color:#b7cff7!important;}
+
+  /* 页面标题区统一为深蓝渐变，强化辨识度 */
+  body>section.hero,body>header.hero,main.shell>header.hero,body>.wrap>header,body.page-market header{
+    background:linear-gradient(135deg,#172554 0%,#1e40af 58%,#3b82f6 100%)!important;
+    color:#fff!important;border:1px solid rgba(255,255,255,.14)!important;
+    box-shadow:0 18px 45px rgba(30,64,175,.18)!important;
+  }
+  body>section.hero,body>header.hero{padding:42px 28px 34px!important;}
+  main.shell>header.hero,body>.wrap>header,body.page-market header{border-radius:28px!important;padding:30px!important;margin:22px 0 20px!important;}
+  body>section.hero .wrap,body>header.hero .wrap{max-width:1280px!important;}
+  body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1,.hero h1{color:#fff!important;font-size:34px!important;line-height:1.18!important;letter-spacing:-.02em!important;font-weight:900!important;}
+  body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,main.shell>header.hero .subtitle,body.page-market header p,.hero p{color:#dbeafe!important;line-height:1.75!important;}
+  body>.wrap>header .badge,main.shell>header.hero .badge,.hero .badge,body.page-market header .badge,.eyebrow{background:rgba(255,255,255,.14)!important;color:#dbeafe!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:999px!important;}
+
+  /* 内容卡片：统一浅蓝白，减少纯白刺眼，同时保证文字对比度 */
+  body :where(.card,.kpi-card,.mini,.share-card,.kem-bs-card,.product,.table-card,.toolbar,.filters,.table-wrap,.tableBox,.summary-box,.formula-box){
+    background:linear-gradient(180deg,var(--hub-surface) 0%,var(--hub-surface-2) 100%)!important;
+    color:var(--hub-ink)!important;
+    border-color:var(--hub-line)!important;
+    box-shadow:var(--hub-shadow)!important;
+  }
+  body :where(.kpi,.kpis .kpi){
+    background:linear-gradient(180deg,#fbfdff 0%,#f0f6fd 100%)!important;
+    color:var(--hub-ink)!important;
+    border-color:var(--hub-line)!important;
+    box-shadow:var(--hub-shadow)!important;
+  }
+  body :where(h1,h2,h3,h4,.value,.kpi-value,.share-brand,.kem-bs-title){color:var(--hub-ink)!important;}
+  body :where(.hero h1,header h1,body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1){color:#fff!important;}
+  body :where(.muted,.subtitle,.hint,.kpi-label,.kpi-sub,.kpi .name,.kpi .delta,.sub,.share-label,.kem-bs-label,.meta,small){color:var(--hub-muted)!important;}
+  body :where(.hero .subtitle,body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,body.page-market header p){color:#dbeafe!important;}
+
+  /* 筛选与分页：统一底色，但保留状态色、业务标签、图表颜色 */
+  body :where(select,input){background:#f8fbff!important;color:var(--hub-ink)!important;border-color:#cbd5e1!important;}
+  body :where(.page-tabs,.pageTabs,.tabs,.filters,.toolbar){background:rgba(248,251,255,.88)!important;backdrop-filter:blur(14px)!important;border-color:var(--hub-line)!important;}
+  body :where(.tab,.mode-tab,.page-tabs a,.pageTabs button,.switches button,.pager button){background:#f8fbff!important;color:#334155!important;border-color:var(--hub-line)!important;}
+  body :where(.tab.active,.mode-tab.active,.page-tabs a.active,.pageTabs button.active,.switches button.active){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
+  body :where(button.primary,.btn.primary){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
+
+  /* 表格：统一可读性 */
+  body table{background:#f8fbff!important;color:var(--hub-ink)!important;}
+  body th{background:#eaf1fa!important;color:#263447!important;border-bottom-color:var(--hub-line)!important;}
+  body td{color:#111827!important;border-bottom-color:#dfe8f3!important;}
+  body tbody tr:nth-child(even) td{background:#f3f7fd!important;}
+  body tbody tr:hover td{background:#eef5ff!important;}
+  body :where(td:first-child,th:first-child){background:#eef5fc!important;}
+  body :where(tbody tr:hover td:first-child){background:#eef5ff!important;}
+
+  /* 硬挡风页原来是深色图表，统一浅色后单独补强图表轴线、说明条和热力表清晰度 */
+  body.page-market{--text:var(--hub-ink);--muted:#334155;--grid:#d8e3f0;--panel:var(--hub-surface);--panel2:var(--hub-surface-2);--card:var(--hub-surface);}
+  body.page-market .fieldGuide{background:#e6f6fb!important;color:#174151!important;border-color:#9bd9e7!important;}
+  body.page-market .fieldGuide b{color:#0f3a4a!important;}
+  body.page-market .axis{stroke:#475569!important;opacity:.75!important;}
+  body.page-market .gridline{stroke:#d8e3f0!important;opacity:1!important;}
+  body.page-market svg text{fill:#334155!important;}
+  body.page-market .dot{stroke:#f8fbff!important;}
+  body.page-market .heatCell{border-color:#d8e3f0!important;color:#111827!important;}
+  body.page-market .pill{background:#eaf2ff!important;color:#1d4ed8!important;}
+  body.page-market .pos{color:#059669!important;}
+  body.page-market .neg{color:#991b1b!important;}
+
+  @media(max-width:820px){.multipage-site-nav .inner,.topnav .navin{align-items:flex-start!important;flex-direction:column!important}.multipage-site-nav .links,.topnav .navlinks{width:100%!important;overflow:auto!important;flex-wrap:nowrap!important}.hero h1,body>section.hero h1,body>header.hero h1,body.page-market header h1{font-size:28px!important}}
+</style>
+<!-- unified-category-theme:end -->
+<!-- readability-audit-fix:start -->
+<style>
+  body.page-budget{--green:#047857;--red:#991b1b;--sub:#475569;}
+  body.page-budget .pos{color:#047857!important;font-weight:900!important;}
+  body.page-budget .neg{color:#991b1b!important;font-weight:900!important;}
+  body.page-budget .good{background:#dcfce7!important;color:#166534!important;font-weight:900!important;}
+  body.page-budget .bad{background:#fee2e2!important;color:#991b1b!important;font-weight:900!important;}
+  body.page-budget .warn{background:#fef3c7!important;color:#92400e!important;font-weight:900!important;}
+  body.page-budget .sub,body.page-budget .hint,body.page-budget .muted,body.page-budget .cell-sub,body.page-budget .tab,body.page-budget .mode-tab{color:#475569!important;}
+  body.page-budget th{color:#334155!important;}
+  body.page-budget .kpi h3{color:#334155!important;}
+</style>
+<!-- readability-audit-fix:end -->
+
+<!-- sort-highlight-fix:start -->
+<style>
+  body.page-budget th.sortable{cursor:pointer!important;user-select:none!important;padding-right:18px!important;transition:background .15s ease,color .15s ease,box-shadow .15s ease;}
+  body.page-budget th.sortable::after{content:'↕';display:inline-block;margin-left:6px;color:#64748b;font-size:12px;font-weight:900;}
+  body.page-budget th.sort-asc,body.page-budget th.sort-desc{background:linear-gradient(135deg,#1d4ed8,#2563eb)!important;color:#fff!important;box-shadow:inset 0 -3px 0 #f59e0b,0 0 0 2px rgba(37,99,235,.18)!important;}
+  body.page-budget th.sort-asc::after{content:'↑';color:#fff!important;}
+  body.page-budget th.sort-desc::after{content:'↓';color:#fff!important;}
+  body.page-budget th.sort-asc:first-child,body.page-budget th.sort-desc:first-child{background:linear-gradient(135deg,#1d4ed8,#2563eb)!important;color:#fff!important;}
+  body.page-budget .sort-chip{display:inline-flex;align-items:center;margin-left:6px;padding:2px 6px;border-radius:999px;background:#f59e0b;color:#111827;font-size:11px;font-weight:900;vertical-align:middle;}
+</style>
+<!-- sort-highlight-fix:end -->
+
+<style>
+  body.page-budget .kpi{cursor:pointer!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;position:relative;}
+  body.page-budget .kpi:hover{transform:translateY(-2px);box-shadow:0 18px 42px rgba(37,99,235,.14)!important;border-color:#bfdbfe!important;}
+  body.page-budget .kpi.active{border-color:#2563eb!important;background:linear-gradient(180deg,#ffffff 0,#eef5ff 100%)!important;box-shadow:0 18px 46px rgba(37,99,235,.18)!important;}
+  body.page-budget .kpi.active::after{content:'\5df2\8054\52a8';position:absolute;right:16px;top:16px;padding:3px 8px;border-radius:999px;background:#2563eb;color:#fff;font-size:11px;font-weight:900;}
+</style>
+
+</head>
+<body class="page-budget">
+<style>
+.multipage-site-nav{position:sticky!important;top:0!important;z-index:9999!important;background:rgba(255,255,255,.94)!important;backdrop-filter:blur(16px)!important;border-bottom:1px solid #e5eaf2!important;box-shadow:0 8px 28px rgba(15,23,42,.06)!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important}
+.multipage-site-nav .inner{max-width:1280px!important;margin:0 auto!important;padding:10px 24px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important}
+.multipage-site-nav .title{font-size:15px!important;font-weight:900!important;color:#172554!important;white-space:nowrap!important}
+.multipage-site-nav .links{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+.multipage-site-nav a{display:inline-flex!important;align-items:center!important;text-decoration:none!important;color:#334155!important;background:#fff!important;border:1px solid #e5eaf2!important;border-radius:999px!important;padding:8px 12px!important;font-size:13px!important;line-height:1!important;font-weight:750!important}
+.multipage-site-nav a:hover{color:#2563eb!important;background:#eff6ff!important;border-color:#bfdbfe!important}
+@media(max-width:760px){.multipage-site-nav .inner{align-items:flex-start!important;flex-direction:column!important}.multipage-site-nav .links{width:100%!important;overflow:auto!important;flex-wrap:nowrap!important}}
+</style>
+<div class="multipage-site-nav">
+  <div class="inner">
+    <div class="title">品类复盘中心</div>
+    <div class="links">
+      <a href="../../index.html">总览首页</a>
+      <a href="../aba-search-analysis.html">类目搜索词分析</a>
+      <a href="../bs-new-release-analysis/index.html">BS & 新品榜分析</a>
+      <a href="../windshield-market-analysis.html">硬挡风市场分析</a>
+      <a href="./index.html">预算达成分析</a>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>挡风品类预算达成分析看板</h1>
+        <p>聚焦预算达成、环比同比和费用率健康度。先用顶部筛选锁定时间与一级车型，再在明细区切换二级车型、新品、属性、等级或 SKU 视角。</p>
+      </div>
+      <div class="hero-tags"><span class="hero-tag">预算 vs 实际</span><span class="hero-tag">月度 / 季度</span><span class="hero-tag">明细可导出</span></div>
+    </div>
+  </header>
+
+  <section class="toolbar card">
+    <div class="toolbar-inner">
+      <div class="field"><label>时间维度</label><select id="grain"><option value="month">月度</option><option value="quarter">季度</option></select></div>
+      <div class="field"><label>开始时间</label><select id="periodStart"></select></div>
+      <div class="field"><label>结束时间</label><select id="periodEnd"></select></div>
+      <div class="field"><label>一级车型</label><select id="vehicle"></select></div>
+      <div class="actions"><button class="primary" id="exportDetail">导出明细 Excel</button><button id="exportSummary">导出汇总 Excel</button></div>
+    </div>
+    <div class="meta-line"><span>数据源：<b id="sourceName"></b></span><span>文件时间：<b id="sourceMtime"></b></span><span>2026实际覆盖：<b id="coverage"></b></span><span>同比=2025同范围，环比=上一段等长周期。</span></div>
+  </section>
+  <select id="segment"><option value="sec">二级车型</option><option value="isNew">是否新品</option><option value="attr">产品属性</option><option value="grade">产品等级</option><option value="sku">SKU明细</option></select>
+
+  <section id="kpiCards" class="kpis"></section>
+
+  <section class="main-grid">
+    <div class="card card-pad trend-card"><div class="head"><div><h2 id="trendTitle">销售额预算达成趋势</h2><div class="hint" id="trendHint">点击顶部指标卡可切换销量、销售额、回款额、利润额、客单价；柱形=预算/实际，折线=达成率。</div></div><span class="badge" id="trendBadge"></span></div><canvas id="trendCanvas" width="900" height="340"></canvas></div>
+    <div class="card card-pad"><div class="head"><div><h2>自动诊断</h2><div class="hint">随筛选条件自动更新</div></div></div><ul class="insights" id="insights"></ul></div>
+  </section>
+
+  <section class="ops-grid">
+    <div class="card card-pad"><div class="head"><h2>核心指标达成</h2></div><div id="coreBars"></div></div>
+    <div class="card card-pad"><div class="head"><h2>费用率健康度</h2><span class="hint">偏差=实际-预算</span></div><div id="rateCards"></div></div>
+    <div class="card card-pad"><div class="head"><h2>销售额缺口排行</h2><span class="hint">按当前明细视角</span></div><canvas id="rankCanvas" width="680" height="330"></canvas></div>
+    <div class="card card-pad"><div class="head"><h2>增长重点排行</h2><span class="hint">销售额同比增长额</span></div><canvas id="growthCanvas" width="680" height="330"></canvas></div>
+  </section>
+
+  <section class="card table-card">
+    <div class="head table-head"><div><h2>总体 & 细分明细：重点字段</h2><div class="hint">默认只看销售额、利润、客单价、回款率、销量达成和关键变化；点击字段表头可排序，需要核对全部口径时可切换到“完整字段”。</div></div><div class="detail-controls"><div class="view-toggle" id="fieldToggle"><span class="mode-tab active" data-mode="focus">重点字段</span><span class="mode-tab" data-mode="full">完整字段</span></div><div class="tabs" id="quickTabs"></div></div></div>
+    <div class="table-wrap"><table id="amountTable" class="focus"></table></div>
+  </section>
+
+  <section class="detail-grid">
+    <div class="card card-pad small"><div class="head"><div><h2>总体指标达成情况</h2><div class="hint">重点字段显示全部指标，只精简列数；点击字段表头可排序，偏差均为实际率-预算率。</div></div><div class="view-toggle" id="rateToggle"><span class="mode-tab active" data-mode="focus">重点字段</span><span class="mode-tab" data-mode="full">完整字段</span></div></div><div class="table-wrap"><table id="rateTable"></table></div></div>
+    <div class="card card-pad small"><div class="head"><div><h2>细分指标对比</h2><div class="hint">默认优先看需关注项；点击字段表头可排序，偏差均为实际率-预算率。</div></div><div class="head-actions"><select id="rateSelect"></select><div class="view-toggle" id="segRateToggle"><span class="mode-tab active" data-mode="focus">重点字段</span><span class="mode-tab" data-mode="full">完整字段</span></div></div></div><div class="table-wrap"><table id="segmentRateTable"></table></div></div>
+  </section>
+
+  <details class="card formula-box"><summary>查看指标公式</summary><div class="formula"><div>退款率 = 退款额 / 销售额（GMV）</div><div>产品头程成本率 = 产品头程成本 / 销售收入净额</div><div>净销量成本率 = 净销量成本 / 销售收入净额</div><div>回款率 = 回款额 / 销售额（GMV）</div><div>盈利能力率 = 盈利能力额 / 销售收入净额</div><div>平台佣金率 = 平台佣金 / 销售收入净额</div><div>平台促销费率 = 平台促销费 / 销售额（GMV）</div><div>销售配送费率 = 销售配送费 / 销售收入净额</div><div>仓储费率 = 仓储费 / 销售收入净额</div><div>站内广告费率 = 站内广告花费 / 销售收入净额</div><div>客单价 = 销售额（GMV） / 销量</div></div></details>
+  <div class="foot">本看板为本地静态页面；无需联网即可查看与导出。</div>
+</main>
+<script>
+const D=window.DASH_DATA,rows=D.rows,$=id=>document.getElementById(id);
+const keys=['qty','gmv','collection','profit','refund','promo','net','cost','head','commission','delivery','storage','ads'];
+const cn={qty:'销量',gmv:'销售额',collection:'回款额',profit:'盈利能力额',aov:'客单价',refund:'退款额',promo:'平台促销费',net:'销售收入净额',cost:'净销量成本',head:'产品头程成本',commission:'平台佣金',delivery:'销售配送费',storage:'仓储费',ads:'站内广告花费'};
+const am=[['qty','销量','int'],['gmv','销售额','money'],['collection','回款额','money'],['profit','利润额','money'],['aov','客单价','price']];
+let trendMetric='gmv';const amountMeta=Object.fromEntries(am.map(m=>[m[0],{label:m[1],type:m[2]}]));
+let amountMode='focus';
+let rateMode='focus',segRateMode='focus';
+const rates=[['refundRate','退款率','refund','gmv','low'],['headCostRate','产品头程成本率','head','net','low'],['costRate','净销量成本率','cost','net','low'],['collectionRate','回款率','collection','gmv','high'],['profitRate','盈利能力率','profit','net','high'],['commissionRate','平台佣金率','commission','net','low'],['promoRate','平台促销费率','promo','gmv','low'],['deliveryRate','销售配送费率','delivery','net','low'],['storageRate','仓储费率','storage','net','low'],['adsRate','站内广告费率','ads','net','low']];
+const dimCN={sec:'二级车型',third:'三级车型',isNew:'是否新品',attr:'产品属性',grade:'产品等级',sku:'SKU'};
+function fmt(n,t='money'){n=+n||0;if(t==='int')return Math.round(n).toLocaleString('zh-CN');if(t==='price')return '$'+n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});let a=Math.abs(n);if(a>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('zh-CN',{maximumFractionDigits:0})}
+function raw(n,d=0){return (+n||0).toLocaleString('zh-CN',{maximumFractionDigits:d})}function pct(n){return n==null||!isFinite(n)?'—':(n*100).toFixed(1)+'%'}function pp(n){return n==null||!isFinite(n)?'—':((n*100)>0?'+':'')+(n*100).toFixed(1)+'pp'}function div(a,b){return b?a/b:null}function dp(a,b){return b?a/b-1:null}
+function sum(rs,kind='actual'){let o={};keys.forEach(k=>o[k]=0);rs.forEach(r=>keys.forEach(k=>o[k]+=+(r[kind]&&r[kind][k]||0)));o.aov=div(o.gmv,o.qty)||0;return o}function rate(s,d){return div(s[d[2]],s[d[3]])}
+function periodIdx(v){if(!v)return 1;if(v.includes('Q'))return +v.slice(-1);return +v.split('-')[1]}
+function periodText(id){let el=$(id);return el&&el.selectedOptions[0]?el.selectedOptions[0].textContent:''}
+function syncPeriodRange(changed){let s=$('periodStart'),e=$('periodEnd');if(!s||!e)return;let si=periodIdx(s.value),ei=periodIdx(e.value);if(si>ei){if(changed==='start')e.value=s.value;else s.value=e.value}}
+function months(){syncPeriodRange();let s=periodIdx($('periodStart').value),e=periodIdx($('periodEnd').value),out=[];if(s>e){let t=s;s=e;e=t}if($('grain').value==='quarter'){for(let q=s;q<=e;q++)out.push((q-1)*3+1,(q-1)*3+2,(q-1)*3+3)}else{for(let m=s;m<=e;m++)out.push(m)}return out}
+function norm(m){return m<1?{year:2025,month:m+12}:m>12?{year:2027,month:m-12}:{year:2026,month:m}}function prev(ms){let l=ms.length,s=Math.min(...ms)-l;return Array.from({length:l},(_,i)=>norm(s+i))}function yoy(ms){return ms.map(m=>({year:2025,month:m}))}
+function seg(r,d){return d==='sku'?(r.sku||r.platformSku||'未标记'):(r[d]||'未标记')}function byPairs(ps,veh,dim,label){let set=new Set(ps.map(p=>p.year+'-'+p.month));return rows.filter(r=>set.has(r.year+'-'+r.month)&&(veh==='全部'||r.vehicle===veh)&&(!dim||label===undefined||seg(r,dim)===label))}function cur(veh){let ms=months();return rows.filter(r=>r.year===2026&&ms.includes(r.month)&&(veh==='全部'||r.vehicle===veh))}function grp(rs,d){let m=new Map();rs.forEach(r=>{let k=seg(r,d);if(!m.has(k))m.set(k,[]);m.get(k).push(r)});return new Map([...m].sort((a,b)=>sum(b[1]).gmv-sum(a[1]).gmv))}function ctx(){let ms=months(),v=$('vehicle').value;return{c:byPairs(ms.map(m=>({year:2026,month:m})),v),p:byPairs(prev(ms),v),y:byPairs(yoy(ms),v)}}function periodLabel(){let a=periodText('periodStart'),b=periodText('periodEnd');return a&&b&&a!==b?a+' 至 '+b:(a||b||'')}
+function init(){$("sourceName").textContent=D.sourceName;$("sourceMtime").textContent=D.sourceMtime;$("coverage").textContent=D.actualCoverage;$('vehicle').innerHTML='<option value="全部">全部</option>'+D.vehicles.map(v=>`<option>${v}</option>`).join('');rates.forEach(d=>$('rateSelect').insertAdjacentHTML('beforeend',`<option value="${d[0]}">${d[1]}</option>`));fillPeriods();let tabs=[['sec','二级车型'],['isNew','是否新品'],['attr','产品属性'],['grade','产品等级'],['sku','SKU明细']];$('quickTabs').innerHTML=tabs.map((t,i)=>`<span class="tab ${i?'':'active'}" data-dim="${t[0]}">${t[1]}</span>`).join('');$('quickTabs').onclick=e=>{if(e.target.dataset.dim){$('segment').value=e.target.dataset.dim;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.dim===$('segment').value));render()}};$('fieldToggle').onclick=e=>{if(e.target.dataset.mode){amountMode=e.target.dataset.mode;document.querySelectorAll('#fieldToggle .mode-tab').forEach(x=>x.classList.toggle('active',x.dataset.mode===amountMode));amountTable()}};$('rateToggle').onclick=e=>{if(e.target.dataset.mode){rateMode=e.target.dataset.mode;document.querySelectorAll('#rateToggle .mode-tab').forEach(x=>x.classList.toggle('active',x.dataset.mode===rateMode));rateTable()}};$('segRateToggle').onclick=e=>{if(e.target.dataset.mode){segRateMode=e.target.dataset.mode;document.querySelectorAll('#segRateToggle .mode-tab').forEach(x=>x.classList.toggle('active',x.dataset.mode===segRateMode));segRateTable()}};$('kpiCards').onclick=e=>{let card=e.target.closest('.kpi[data-metric]');if(card){trendMetric=card.dataset.metric;renderKpi();drawTrend()}};['grain','periodStart','periodEnd','vehicle','segment','rateSelect'].forEach(id=>$(id).onchange=()=>{if(id==='grain')fillPeriods();if(id==='periodStart'||id==='periodEnd')syncPeriodRange(id==='periodStart'?'start':'end');if(id==='segment')document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.dim===$('segment').value));render()});$('exportDetail').onclick=exportDetail;$('exportSummary').onclick=exportSummary;render()}
+function fillPeriods(){let isQ=$('grain').value==='quarter',opts=isQ?[1,2,3,4].map(q=>({idx:q,val:'2026-Q'+q,txt:'2026\u5e74Q'+q})):Array.from({length:12},(_,i)=>({idx:i+1,val:'2026-'+String(i+1).padStart(2,'0'),txt:'2026\u5e74'+(i+1)+'\u6708'})),html=opts.map(o=>'<option value="'+o.val+'">'+o.txt+'</option>').join(''),s=$('periodStart'),e=$('periodEnd'),oldS=s.value,oldE=e.value;s.innerHTML=html;e.innerHTML=html;if(isQ){s.value=/Q/.test(oldS)?oldS:'2026-Q2';e.value=/Q/.test(oldE)?oldE:'2026-Q2'}else{s.value=/Q/.test(oldS)?'2026-06':(oldS||'2026-06');e.value=/Q/.test(oldE)?'2026-06':(oldE||'2026-06')}syncPeriodRange()}function render(){if($('segment').value==='third')$('segment').value='sec';renderKpi();drawTrend();bars();rateCards();drawRank();drawGrowthRank();amountTable();rateTable();segRateTable();insights()}
+function renderKpi(){let x=ctx(),a=sum(x.c),b=sum(x.c,'budget'),p=sum(x.p),y=sum(x.y);$('kpiCards').innerHTML=am.map(m=>{let av=a[m[0]],bv=b[m[0]],ach=div(av,bv),cls=ach==null?'warn':ach>=1?'good':ach>=.9?'warn':'bad',active=m[0]===trendMetric?' active':'';return `<div class="card kpi${active}" data-metric="${m[0]}" title="${m[1]}趋势联动"><h3>${m[1]}</h3><div class="value">${fmt(av,m[2])}</div><div class="sub"><span>预算 ${fmt(bv,m[2])}</span><span class="badge ${cls}">达成 ${pct(ach)}</span><span>环比 ${pct(dp(av,p[m[0]]))}</span><span>同比 ${pct(dp(av,y[m[0]]))}</span></div><div class="progress"><span style="width:${Math.min(130,(ach||0)*100)}%"></span></div></div>`}).join('')}
+function units(){return $('grain').value==='quarter'?[1,2,3,4].map(q=>({lab:'Q'+q,ms:[(q-1)*3+1,(q-1)*3+2,(q-1)*3+3]})):Array.from({length:12},(_,i)=>({lab:(i+1)+'月',ms:[i+1]}))}
+function trendMeta(){return amountMeta[trendMetric]||amountMeta.gmv}
+function drawPointLabel(g,txt,x,y){if(!txt||txt==='—')return;g.save();g.font='11px Microsoft YaHei';let w=g.measureText(txt).width+12,h=20,yy=y-27;if(yy<4)yy=y+11;g.fillStyle='rgba(255,255,255,.92)';g.strokeStyle='rgba(245,158,11,.45)';g.lineWidth=1;g.beginPath();g.roundRect?g.roundRect(x-w/2,yy,w,h,8):g.rect(x-w/2,yy,w,h);g.fill();g.stroke();g.fillStyle='#92400e';g.textAlign='center';g.fillText(txt,x,yy+14);g.restore()}
+function drawTrend(){let meta=trendMeta(),key=trendMetric,label=meta.label,type=meta.type,title=$('trendTitle'),hint=$('trendHint');if(title)title.textContent=label+'预算达成趋势';if(hint)hint.textContent='当前联动指标：'+label+'；柱形显示预算/实际，折线显示达成率，折线标签为各月/季度达成率。';let c=$('trendCanvas'),g=c.getContext('2d'),W=c.width,H=c.height,veh=$('vehicle').value;g.clearRect(0,0,W,H);let vs=units().map(u=>{let rs=rows.filter(r=>r.year===2026&&u.ms.includes(r.month)&&(veh==='全部'||r.vehicle===veh)),sa=sum(rs),sb=sum(rs,'budget'),a=sa[key],b=sb[key];return{...u,a,b,ach:div(a,b)}}),max=Math.max(...vs.flatMap(v=>[v.a,v.b]).filter(v=>isFinite(v)),1),pad={l:68,r:38,t:42,b:46},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;g.strokeStyle='#e6ebf2';g.fillStyle='#687386';g.font='12px Microsoft YaHei';g.textAlign='left';for(let i=0;i<=4;i++){let y=pad.t+ch*i/4;g.beginPath();g.moveTo(pad.l,y);g.lineTo(W-pad.r,y);g.stroke();g.fillText(fmt(max*(1-i/4),type),8,y+4)}g.font='12px Microsoft YaHei';let step=cw/vs.length,bw=Math.min(26,step*.28),pts=[],selMs=months();vs.forEach((v,i)=>{let x=pad.l+step*i+step/2;if(v.ms.some(m=>selMs.includes(m))){g.fillStyle='rgba(37,99,235,.07)';g.fillRect(x-step/2+3,pad.t,Math.max(1,step-6),ch)}let hb=ch*(v.b||0)/max,ha=ch*(v.a||0)/max;g.fillStyle='#bfdbfe';g.fillRect(x-bw-2,pad.t+ch-hb,bw,hb);g.fillStyle='#2563eb';g.fillRect(x+2,pad.t+ch-ha,bw,ha);g.fillStyle='#687386';g.textAlign='center';g.fillText(v.lab,x,pad.t+ch+23);pts.push([x,pad.t+ch-(Math.min(v.ach||0,1.4)/1.4)*ch,v.ach])});g.strokeStyle='#f59e0b';g.lineWidth=3;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();pts.forEach(p=>{g.fillStyle='#f59e0b';g.beginPath();g.arc(p[0],p[1],4,0,7);g.fill();drawPointLabel(g,pct(p[2]),p[0],p[1])});g.font='12px Microsoft YaHei';g.textAlign='left';g.fillStyle='#bfdbfe';g.fillRect(pad.l,14,14,9);g.fillStyle='#475569';g.fillText('预算',pad.l+20,23);g.fillStyle='#2563eb';g.fillRect(pad.l+70,14,14,9);g.fillStyle='#475569';g.fillText('实际',pad.l+90,23);g.strokeStyle='#f59e0b';g.lineWidth=3;g.beginPath();g.moveTo(pad.l+140,19);g.lineTo(pad.l+162,19);g.stroke();g.fillStyle='#475569';g.fillText('达成率',pad.l+168,23);let sel=vs.filter(v=>months().some(m=>v.ms.includes(m))).reduce((o,v)=>(o.a+=v.a||0,o.b+=v.b||0,o),{a:0,b:0});$('trendBadge').textContent='当前'+label+'达成 '+pct(div(sel.a,sel.b))}
+function bars(){let x=ctx(),a=sum(x.c),b=sum(x.c,'budget');$('coreBars').innerHTML=am.map(m=>{let ach=div(a[m[0]],b[m[0]]);return `<div style="margin:0 0 15px"><div style="display:flex;justify-content:space-between;font-size:13px"><b>${m[1]}</b><span>${pct(ach)} · ${fmt(a[m[0]],m[2])} / ${fmt(b[m[0]],m[2])}</span></div><div class="progress"><span style="width:${Math.min(130,(ach||0)*100)}%;background:${(ach||0)>=1?'linear-gradient(90deg,#16a34a,#86efac)':'linear-gradient(90deg,#2563eb,#93c5fd)'}"></span></div></div>`}).join('')}
+function rateCards(){let x=ctx(),a=sum(x.c),b=sum(x.c,'budget'),expenseIds=['refundRate','headCostRate','costRate','commissionRate','promoRate','deliveryRate','storageRate','adsRate'];let items=expenseIds.map(k=>rates.find(d=>d[0]===k)).filter(Boolean).map(d=>{let av=rate(a,d),bv=rate(b,d),diff=(av||0)-(bv||0);return{d:d,av:av,bv:bv,diff:diff}}).sort((a,b)=>b.diff-a.diff);$('rateCards').innerHTML=items.map(o=>{let state=Math.abs(o.diff||0)<.0005?'持平':(o.diff>0?'高于预算':'低于预算'),cls=state==='持平'?'warn':(o.diff>0?'bad':'good');return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><div><b>'+o.d[1]+'</b><div class="hint">实际 '+pct(o.av)+' · 预算 '+pct(o.bv)+'</div></div><span class="badge '+cls+'">'+pp(o.diff)+'</span></div>'}).join('')}
+function drawRank(){let c=$('rankCanvas'),g=c.getContext('2d'),W=c.width,H=c.height,d=$('segment').value,v=$('vehicle').value;g.clearRect(0,0,W,H);let gs=[...grp(cur(v),d)].map(([k,rs])=>{let a=sum(rs).gmv,b=sum(rs,'budget').gmv;return{k,gap:a-b}}).sort((x,y)=>x.gap-y.gap).slice(0,7),mx=Math.max(...gs.map(x=>Math.abs(x.gap)),1);g.font='12px Microsoft YaHei';let left=160,right=14,gap=10,valueW=Math.max(62,...gs.map(x=>g.measureText(fmt(x.gap)).width+4)),barMax=Math.max(80,W-left-right-gap-valueW);gs.forEach((x,i)=>{let y=24+i*42,w=Math.abs(x.gap)/mx*barMax;g.textAlign='left';g.fillStyle='#526071';g.fillText(String(x.k).slice(0,16),12,y+14);g.fillStyle=x.gap>=0?'#16a34a':'#dc2626';g.fillRect(left,y,w,18);g.textAlign='right';g.fillStyle='#182235';g.fillText(fmt(x.gap),W-right,y+14)});g.textAlign='left'}
+function drawGrowthRank(){let c=$('growthCanvas');if(!c)return;let g=c.getContext('2d'),W=c.width,H=c.height,d=$('segment').value,v=$('vehicle').value,ms=months();g.clearRect(0,0,W,H);let gs=[...grp(cur(v),d)].map(([k,rs])=>{let a=sum(rs).gmv,y=sum(byPairs(yoy(ms),v,d,k)).gmv;return{k:k,growth:a-y,rate:dp(a,y),gmv:a}}).sort((x,y)=>y.growth-x.growth).slice(0,7),mx=Math.max(...gs.map(x=>Math.abs(x.growth)),1);g.font='12px Microsoft YaHei';let left=160,right=14,gap=10,valueW=Math.max(70,...gs.map(x=>g.measureText(fmt(x.growth)).width+4)),barMax=Math.max(80,W-left-right-gap-valueW);gs.forEach((x,i)=>{let y=24+i*42,w=Math.abs(x.growth)/mx*barMax;g.textAlign='left';g.fillStyle='#526071';g.fillText(String(x.k).slice(0,16),12,y+14);g.fillStyle=x.growth>=0?'#16a34a':'#dc2626';g.fillRect(left,y,w,18);g.textAlign='right';g.fillStyle='#182235';g.fillText(fmt(x.growth),W-right,y+14);if(x.rate!=null&&isFinite(x.rate)){g.fillStyle=x.growth>=0?'#15803d':'#b91c1c';g.font='10px Microsoft YaHei';g.fillText(pct(x.rate),W-right,y+31);g.font='12px Microsoft YaHei'}});g.textAlign='left'}
+function achCls(n){return n==null||!isFinite(n)?'warn':n>=1?'good':n>=.9?'warn':'bad'}
+function badgePct(n){return '<span class="badge '+achCls(n)+'">'+pct(n)+'</span>'}
+function compact(n,t='money'){n=+n||0;if(t==='int')return fmt(n,'int');if(t==='price')return (n<0?'-':'')+fmt(Math.abs(n),'price');return (n<0?'-':'')+fmt(Math.abs(n),'money')}
+function pairCell(a,b,t='money'){return '<div class="cell-main">'+compact(a,t)+'</div><div class="cell-sub">预算 '+compact(b,t)+'</div>'}
+function gapCell(n,t='money'){return '<span class="'+((+n||0)>=0?'pos':'neg')+'">'+compact(n,t)+'</span>'}
+function deltaTxt(label,n){return n==null||!isFinite(n)?'<span class="muted">'+label+' —</span>':'<span class="'+(n>=0?'pos':'neg')+'">'+label+' '+pct(n)+'</span>'}
+function focusTag(o){let salesGap=o.a.gmv-o.b.gmv,profitGap=o.a.profit-o.b.profit,salesAch=div(o.a.gmv,o.b.gmv);if(salesAch!=null&&salesAch>=1&&profitGap>=0)return ['表现达标','good'];if(salesGap<0&&profitGap<0)return ['销售&利润缺口','bad'];if(salesGap<0)return ['先补销售额','bad'];if(profitGap<0)return ['利润需改善','warn'];if(salesAch!=null&&salesAch>=.9)return ['接近目标','warn'];return ['需关注','warn']}
+function amountItems(d,v,ms){let list=[...grp(cur(v),d)].map(([lab,rs])=>({lab:lab,a:sum(rs),b:sum(rs,'budget'),p:sum(byPairs(prev(ms),v,d,lab)),y:sum(byPairs(yoy(ms),v,d,lab)),sort:sum(rs).gmv})).sort((a,b)=>b.sort-a.sort);let total={lab:'总计',a:sum(cur(v)),b:sum(cur(v),'budget'),p:sum(byPairs(prev(ms),v)),y:sum(byPairs(yoy(ms),v)),sort:1/0};return [total,...list]}
+function amountTable(){let d=$('segment').value,v=$('vehicle').value,ms=months(),items=amountItems(d,v,ms);$('amountTable').className=amountMode==='focus'?'focus':'full';if(amountMode==='full')return amountTableFull(d,items);return amountTableFocus(d,items)}
+function amountTableFocus(d,items){let html='<thead><tr><th>'+dimCN[d]+'</th><th>重点判断</th><th>销售额<br>实际 / 预算</th><th>销售额达成</th><th>销售额缺口</th><th>利润额<br>实际 / 预算</th><th>利润达成</th><th>利润缺口</th><th>客单价<br>实际 / 预算</th><th>客单价达成</th><th>客单价变化</th><th>回款率</th><th>销量达成</th><th>销售额变化</th></tr></thead><tbody>';items.forEach(o=>{let tag=focusTag(o),salesAch=div(o.a.gmv,o.b.gmv),profitAch=div(o.a.profit,o.b.profit),aovAch=div(o.a.aov,o.b.aov),qtyAch=div(o.a.qty,o.b.qty),collectionRate=div(o.a.collection,o.a.gmv),salesGap=o.a.gmv-o.b.gmv,profitGap=o.a.profit-o.b.profit,aovGap=o.a.aov-o.b.aov;html+='<tr><td><b>'+o.lab+'</b></td><td><span class="badge '+tag[1]+'">'+tag[0]+'</span></td><td>'+pairCell(o.a.gmv,o.b.gmv)+'</td><td>'+badgePct(salesAch)+'</td><td>'+gapCell(salesGap)+'</td><td>'+pairCell(o.a.profit,o.b.profit)+'</td><td>'+badgePct(profitAch)+'</td><td>'+gapCell(profitGap)+'</td><td>'+pairCell(o.a.aov,o.b.aov,'price')+'</td><td>'+badgePct(aovAch)+'</td><td><div class="change-stack">'+gapCell(aovGap,'price')+deltaTxt('同比',dp(o.a.aov,o.y.aov))+deltaTxt('环比',dp(o.a.aov,o.p.aov))+'</div></td><td>'+pct(collectionRate)+'</td><td>'+badgePct(qtyAch)+'</td><td><div class="change-stack">'+deltaTxt('同比',dp(o.a.gmv,o.y.gmv))+deltaTxt('环比',dp(o.a.gmv,o.p.gmv))+'</div></td></tr>'});$('amountTable').innerHTML=html+'</tbody>';makeSortable('amountTable')}
+function amountTableFull(d,items){let html='<thead><tr><th>'+dimCN[d]+'</th>';am.forEach(m=>html+='<th>'+m[1]+'实际</th><th>'+m[1]+'预算</th><th>'+m[1]+'达成</th><th>'+m[1]+'环比</th><th>'+m[1]+'同比</th>');html+='</tr></thead><tbody>';items.forEach(o=>{html+='<tr><td><b>'+o.lab+'</b></td>';am.forEach(m=>{let k=m[0];html+='<td>'+compact(o.a[k],m[2])+'</td><td>'+compact(o.b[k],m[2])+'</td><td>'+pct(div(o.a[k],o.b[k]))+'</td><td>'+pct(dp(o.a[k],o.p[k]))+'</td><td>'+pct(dp(o.a[k],o.y[k]))+'</td>'});html+='</tr>'});$('amountTable').innerHTML=html+'</tbody>';makeSortable('amountTable')}
+function sortNumberText(s){s=(s||'').replace(/,/g,'').trim();let first=s.split(/\n/)[0]||s;let m=first.match(/([+-])?\s*\$?\s*([+-])?\s*(\d+(?:\.\d+)?)\s*(M|K|%|pp)?/i);if(!m)return NaN;let sign=m[1]||m[2]||'',n=parseFloat(m[3]);if(sign==='-')n=-n;let unit=(m[4]||'').toUpperCase();if(unit==='M')n*=1000000;if(unit==='K')n*=1000;return n}
+function sortCellValue(td){let txt=(td&&((td.innerText||td.textContent)||'').trim())||'';let n=sortNumberText(txt);return isNaN(n)?txt:n}
+function cleanSortText(th){return ((th&&th.childNodes)?[...th.childNodes].filter(n=>!(n.classList&&n.classList.contains('sort-chip'))).map(n=>n.textContent||'').join(''):(th.innerText||'')).replace(/[↕↑↓]/g,'').trim()}
+function makeSortable(tableId){let table=$(tableId);if(!table||!table.tHead||!table.tBodies.length)return;let ths=[...table.tHead.querySelectorAll('tr:last-child th')];ths.forEach((th,idx)=>{if(!th.dataset.baseHtml)th.dataset.baseHtml=th.innerHTML;th.classList.add('sortable');th.title='点击排序';th.onclick=function(){let dir=th.dataset.sort==='asc'?'desc':'asc',label=cleanSortText(th)||'当前字段';ths.forEach(x=>{x.classList.remove('sort-asc','sort-desc');delete x.dataset.sort;x.style.removeProperty('color');x.style.removeProperty('background');if(x.dataset.baseHtml)x.innerHTML=x.dataset.baseHtml});th.dataset.sort=dir;th.classList.add(dir==='asc'?'sort-asc':'sort-desc');th.style.setProperty('color','#fff','important');th.style.setProperty('background','linear-gradient(135deg,#1d4ed8,#2563eb)','important');th.innerHTML='<span class="sort-label" style="color:#fff!important;font-weight:950;">'+htmlEsc(label)+'</span><span class="sort-chip">'+(dir==='asc'?'升序':'降序')+'</span>';th.title='当前按【'+label+'】'+(dir==='asc'?'升序':'降序')+'排序，点击切换';let tb=table.tBodies[0],rows=[...tb.rows],pinned=rows.filter(r=>(r.cells[0]?.innerText||'').trim()==='总计'),body=rows.filter(r=>(r.cells[0]?.innerText||'').trim()!=='总计');body.sort((a,b)=>{let av=sortCellValue(a.cells[idx]),bv=sortCellValue(b.cells[idx]);let r=(typeof av==='number'&&typeof bv==='number')?av-bv:String(av).localeCompare(String(bv),'zh-CN',{numeric:true});return dir==='asc'?r:-r});[...pinned,...body].forEach(r=>tb.appendChild(r))}})}
+function orderedRates(){let order=['collectionRate','profitRate','refundRate','headCostRate','costRate','commissionRate','promoRate','deliveryRate','storageRate','adsRate'];return order.map(k=>rates.find(d=>d[0]===k)).filter(Boolean)}
+function rateOk(d,diff){return d[4]==='high'?diff>=0:diff<=0}
+function rateSortVal(d,diff){return d[4]==='high'?-(diff||0):(diff||0)}
+function rateDir(d){return d[4]==='high'?'越高越好':'越低越好'}
+function rateJudge(d,diff){let ok=rateOk(d,diff);return '<span class="badge '+(ok?'good':'bad')+'">'+(ok?'达标/改善':'需关注')+'</span>'}
+function rateTable(){let x=ctx(),a=sum(x.c),b=sum(x.c,'budget'),p=sum(x.p),y=sum(x.y);if(rateMode==='full')return rateTableFull(a,b,p,y);return rateTableFocus(a,b)}
+function rateTableFocus(a,b){let html='<thead><tr><th>指标</th><th>实际</th><th>预算</th><th>偏差<br>实际-预算</th><th>判断</th></tr></thead><tbody>';orderedRates().forEach(d=>{let av=rate(a,d),bv=rate(b,d),diff=(av||0)-(bv||0);html+='<tr><td><b>'+d[1]+'</b><div class="cell-sub">'+rateDir(d)+'</div></td><td class="cell-main">'+pct(av)+'</td><td>'+pct(bv)+'</td><td class="'+(rateOk(d,diff)?'pos':'neg')+'">'+pp(diff)+'</td><td>'+rateJudge(d,diff)+'</td></tr>'});$('rateTable').innerHTML=html+'</tbody>';makeSortable('rateTable')}
+function rateTableFull(a,b,p,y){let html='<thead><tr><th>指标</th><th>实际</th><th>预算</th><th>偏差<br>实际-预算</th><th>环比</th><th>同比</th><th>判断</th></tr></thead><tbody>';orderedRates().forEach(d=>{let av=rate(a,d),bv=rate(b,d),pv=rate(p,d),yv=rate(y,d),diff=(av||0)-(bv||0);html+='<tr><td><b>'+d[1]+'</b></td><td>'+pct(av)+'</td><td>'+pct(bv)+'</td><td>'+pp(diff)+'</td><td>'+pp((av||0)-(pv||0))+'</td><td>'+pp((av||0)-(yv||0))+'</td><td>'+rateJudge(d,diff)+'</td></tr>'});$('rateTable').innerHTML=html+'</tbody>';makeSortable('rateTable')}
+function segRateTable(){let d=$('segment').value,v=$('vehicle').value,ms=months(),rd=rates.find(x=>x[0]===$('rateSelect').value)||rates[0],items=[...grp(cur(v),d)].map(([lab,rs])=>({lab:lab,a:sum(rs),b:sum(rs,'budget'),p:sum(byPairs(prev(ms),v,d,lab)),y:sum(byPairs(yoy(ms),v,d,lab)),sort:sum(rs).gmv}));if(segRateMode==='full')return segRateTableFull(d,rd,items);return segRateTableFocus(d,rd,items)}
+function segRateTableFocus(d,rd,items){let html='<thead><tr><th>'+dimCN[d]+'</th><th>重点判断</th><th>'+rd[1]+'<br>实际 / 预算</th><th>偏差<br>实际-预算</th><th>销售额</th><th>销售额达成</th></tr></thead><tbody>';items.map(o=>{let av=rate(o.a,rd),bv=rate(o.b,rd),diff=(av||0)-(bv||0),ok=rateOk(rd,diff);return Object.assign(o,{av:av,bv:bv,diff:diff,ok:ok,sortDiff:rateSortVal(rd,diff)})}).sort((a,b)=>(a.ok===b.ok?b.sortDiff-a.sortDiff:a.ok?1:-1)||b.sort-a.sort).slice(0,50).forEach(o=>{html+='<tr><td><b>'+o.lab+'</b></td><td>'+rateJudge(rd,o.diff)+'</td><td><div class="cell-main">'+pct(o.av)+'</div><div class="cell-sub">预算 '+pct(o.bv)+'</div></td><td class="'+(o.ok?'pos':'neg')+'">'+pp(o.diff)+'</td><td>'+compact(o.a.gmv)+'</td><td>'+badgePct(div(o.a.gmv,o.b.gmv))+'</td></tr>'});$('segmentRateTable').innerHTML=html+'</tbody>';makeSortable('segmentRateTable')}
+function segRateTableFull(d,rd,items){let html='<thead><tr><th>'+dimCN[d]+'</th><th>'+rd[1]+'实际</th><th>'+rd[1]+'预算</th><th>偏差<br>实际-预算</th><th>环比</th><th>同比</th><th>销售额实际</th><th>销售额达成</th></tr></thead><tbody>';items.sort((a,b)=>b.sort-a.sort).slice(0,80).forEach(o=>{let av=rate(o.a,rd),bv=rate(o.b,rd),pv=rate(o.p,rd),yv=rate(o.y,rd);html+='<tr><td><b>'+o.lab+'</b></td><td>'+pct(av)+'</td><td>'+pct(bv)+'</td><td>'+pp((av||0)-(bv||0))+'</td><td>'+pp((av||0)-(pv||0))+'</td><td>'+pp((av||0)-(yv||0))+'</td><td>'+raw(o.a.gmv)+'</td><td>'+pct(div(o.a.gmv,o.b.gmv))+'</td></tr>'});$('segmentRateTable').innerHTML=html+'</tbody>';makeSortable('segmentRateTable')}
+function insights(){let d=$('segment').value,v=$('vehicle').value,x=ctx(),a=sum(x.c),b=sum(x.c,'budget'),p=sum(x.p),y=sum(x.y),r0=rates[0],adsRateDef=rates.find(z=>z[0]==='adsRate'),gs=[...grp(cur(v),d)].map(([lab,rs])=>{let aa=sum(rs),bb=sum(rs,'budget');return{lab,gap:aa.gmv-bb.gmv,ach:div(aa.gmv,bb.gmv),gmv:aa.gmv,refund:div(aa.refund,aa.gmv)}});let worst=gs.slice().sort((x,y)=>x.gap-y.gap)[0],best=gs.slice().sort((x,y)=>y.gap-x.gap)[0],rr=gs.filter(x=>x.gmv>Math.max(a.gmv*.02,1000)).sort((x,y)=>(y.refund||0)-(x.refund||0))[0],lis=[];lis.push('当前筛选：<b>'+periodLabel()+'</b> / <b>'+v+'</b>，销售额实际 <b>'+fmt(a.gmv)+'</b>，预算达成 <b>'+pct(div(a.gmv,b.gmv))+'</b>，环比 <b>'+pct(dp(a.gmv,p.gmv))+'</b>，同比 <b>'+pct(dp(a.gmv,y.gmv))+'</b>。');lis.push('客单价实际 <b>'+fmt(a.aov,'price')+'</b>，预算 <b>'+fmt(b.aov,'price')+'</b>，达成 <b>'+pct(div(a.aov,b.aov))+'</b>，环比 <b>'+pct(dp(a.aov,p.aov))+'</b>，同比 <b>'+pct(dp(a.aov,y.aov))+'</b>。');lis.push('利润额实际 <b>'+fmt(a.profit)+'</b>，预算达成 <b>'+pct(div(a.profit,b.profit))+'</b>；回款率 <b>'+pct(div(a.collection,a.gmv))+'</b>，预算 <b>'+pct(div(b.collection,b.gmv))+'</b>。');lis.push('退款率实际 <b>'+pct(rate(a,r0))+'</b>，预算 <b>'+pct(rate(b,r0))+'</b>，偏差 <b>'+pp((rate(a,r0)||0)-(rate(b,r0)||0))+'</b>。');if(adsRateDef){let adsAv=rate(a,adsRateDef),adsBv=rate(b,adsRateDef),adsPv=rate(p,adsRateDef),adsYv=rate(y,adsRateDef),adsDiff=(adsAv||0)-(adsBv||0),adsMom=(adsAv||0)-(adsPv||0),adsYoy=(adsAv||0)-(adsYv||0),adsJudge=rateOk(adsRateDef,adsDiff)?'达标/改善':'需关注',adsTail=rateOk(adsRateDef,adsDiff)?'，广告费用率未高于预算':'，广告费用率高于预算，需检查投放效率与预算消耗';lis.push('站内广告费率诊断：实际 <b>'+pct(adsAv)+'</b>，预算 <b>'+pct(adsBv)+'</b>，偏差 <b>'+pp(adsDiff)+'</b>，环比差 <b>'+pp(adsMom)+'</b>，同比差 <b>'+pp(adsYoy)+'</b>；判断：<b>'+adsJudge+'</b>'+adsTail+'。')}if(worst)lis.push(dimCN[d]+'中销售额缺口最大：<b>'+worst.lab+'</b>，缺口 <b>'+fmt(worst.gap)+'</b>，达成 <b>'+pct(worst.ach)+'</b>。');if(best)lis.push(dimCN[d]+'中贡献最好：<b>'+best.lab+'</b>，超/缺口 <b>'+fmt(best.gap)+'</b>。');if(rr)lis.push('退款率较高且销售额有规模的标签：<b>'+rr.lab+'</b>，退款率 <b>'+pct(rr.refund)+'</b>，建议优先复盘质量、适配与页面承诺。');$('insights').innerHTML=lis.map(x=>'<li>'+x+'</li>').join('')}
+
+function esc(v){if(v==null)return'';let s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function htmlEsc(v){if(v==null)return'';return String(v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function xlsPct(n){return n==null||!isFinite(n)?'':(n*100).toFixed(1)+'%'}
+function xlsPp(n){return n==null||!isFinite(n)?'':((n*100)>0?'+':'')+(n*100).toFixed(1)+'pp'}
+function xlsMoney(n){return '$'+(+n||0).toLocaleString('zh-CN',{maximumFractionDigits:0})}
+function xlsInt(n){return Math.round(+n||0).toLocaleString('zh-CN')}function xlsPrice(n){return '$'+(+n||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}function xlsMetric(n,t){return t==='int'?xlsInt(n):(t==='price'?xlsPrice(n):xlsMoney(n))}
+function cell(v,cls){cls=cls||'';return '<td'+(cls?' class="'+cls+'"':'')+'>'+htmlEsc(v)+'</td>'}
+function th(v,attrs){attrs=attrs||'';return '<th '+attrs+'>'+htmlEsc(v)+'</th>'}
+function filterInfo(){return [['时间维度',$('grain').value==='quarter'?'季度':'月度'],['时间范围',periodLabel()],['一级车型',$('vehicle').value],['明细视角',dimCN[$('segment').value]],['导出时间',new Date().toLocaleString('zh-CN')],['数据源',D.sourceName]]}
+function xlsDoc(title,sections){let css='body{font-family:Microsoft YaHei,Arial,sans-serif;color:#111827;background:#fff}h1{font-size:22px;margin:0 0 8px;color:#102454}h2{font-size:16px;margin:22px 0 8px;color:#1d4ed8}.note{color:#64748b;font-size:12px;margin:0 0 14px}table{border-collapse:collapse;margin:0 0 18px;width:auto}th,td{border:1px solid #d9e2ef;padding:7px 10px;font-size:12px;white-space:nowrap;vertical-align:middle}th{background:#eaf1ff;color:#102454;font-weight:700;text-align:center}.group th{background:#1d4ed8;color:#fff;font-size:13px}.subhead th{background:#f3f7ff;color:#334155}.label{background:#f8fafc;font-weight:700;color:#334155}.num{text-align:right}.txt{text-align:left}.good{color:#15803d;font-weight:700}.bad{color:#dc2626;font-weight:700}.warn{color:#b45309;font-weight:700}.freeze-note{color:#64748b;font-size:12px}';let meta='<table><tbody>'+filterInfo().map(function(r){return '<tr>'+cell(r[0],'label txt')+cell(r[1],'txt')+'</tr>'}).join('')+'</tbody></table>';return '<!doctype html><html><head><meta charset="utf-8"><style>'+css+'</style></head><body><h1>'+htmlEsc(title)+'</h1><p class="note">已按当前筛选条件导出；金额为美元口径，达成/同比/环比/费用率均已格式化，方便直接阅读和筛选。</p>'+meta+sections.join('')+'</body></html>'}
+function dl(name,arr){let csv=arr.map(r=>r.map(esc).join(',')).join('\n'),blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function dlXls(name,html){let blob=new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name.endsWith('.xls')?name:name+'.xls';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function amountClass(actual,budget,high){high=high!==false;let d=(+actual||0)-(+budget||0);return Math.abs(d)<1e-9?'warn':(high?(d>=0?'good':'bad'):(d<=0?'good':'bad'))}
+function rateClass(rd,diff){return rateOk(rd,diff)?'good':'bad'}
+function exportDetail(){let rs=cur($('vehicle').value),title='预算达成明细_'+periodLabel()+'_'+$('vehicle').value;let html='<h2>明细数据</h2><p class="freeze-note">字段已重新分组：先看基础信息与核心业绩，再看费用率，最后保留成本/费用金额，便于在 Excel 中横向查看。</p><table><thead>';html+='<tr class="group"><th colspan="11">基础信息</th><th colspan="20">核心业绩指标</th><th colspan="30">指标率</th><th colspan="18">成本/费用金额</th></tr>';html+='<tr class="subhead">'+['年月','一级车型','二级车型','三级车型','是否新品','产品属性','材质','颜色','产品等级','平台SKU','系统SKU'].map(function(x){return th(x)}).join('');am.forEach(function(m){html+=th(m[1]+'实际')+th(m[1]+'预算')+th(m[1]+'达成')+th(m[1]+'缺口')});orderedRates().forEach(function(d){html+=th(d[1]+'实际')+th(d[1]+'预算')+th('偏差')});['退款额','平台促销费','销售收入净额','净销量成本','产品头程成本','平台佣金','销售配送费','仓储费','站内广告花费'].forEach(function(x){html+=th(x+'实际')+th(x+'预算')});html+='</tr></thead><tbody>';rs.forEach(function(r){let a=sum([r]),b=sum([r],'budget');html+='<tr>'+['2026-'+String(r.month).padStart(2,'0'),r.vehicle,r.sec,r.third,r.isNew,r.attr,r.material,r.color,r.grade,r.platformSku,r.sku].map(function(x){return cell(x,'txt')}).join('');am.forEach(function(m){let k=m[0],gap=a[k]-b[k];html+=cell(xlsMetric(a[k],m[2]),'num')+cell(xlsMetric(b[k],m[2]),'num')+cell(xlsPct(div(a[k],b[k])),'num')+cell(xlsMetric(gap,m[2]),'num '+amountClass(a[k],b[k],true))});orderedRates().forEach(function(d){let av=rate(a,d),bv=rate(b,d),diff=(av||0)-(bv||0);html+=cell(xlsPct(av),'num')+cell(xlsPct(bv),'num')+cell(xlsPp(diff),'num '+rateClass(d,diff))});['refund','promo','net','cost','head','commission','delivery','storage','ads'].forEach(function(k){html+=cell(xlsMoney(a[k]),'num')+cell(xlsMoney(b[k]),'num')});html+='</tr>'});html+='</tbody></table>';dlXls(title+'.xls',xlsDoc('预算达成明细导出',[html]))}
+function exportSummary(){let d=$('segment').value,v=$('vehicle').value,ms=months(),title='预算达成汇总_'+periodLabel()+'_'+v+'_'+dimCN[d],sections=[];let c=cur(v),a=sum(c),b=sum(c,'budget'),p=sum(byPairs(prev(ms),v)),y=sum(byPairs(yoy(ms),v));let kpi='<h2>核心指标总览</h2><table><thead><tr class="group"><th>指标</th><th>实际</th><th>预算</th><th>达成</th><th>缺口</th><th>环比</th><th>同比</th></tr></thead><tbody>';am.forEach(function(m){let k=m[0],gap=a[k]-b[k];kpi+='<tr>'+cell(m[1],'txt label')+cell(xlsMetric(a[k],m[2]),'num')+cell(xlsMetric(b[k],m[2]),'num')+cell(xlsPct(div(a[k],b[k])),'num')+cell(xlsMetric(gap,m[2]),'num '+amountClass(a[k],b[k],true))+cell(xlsPct(dp(a[k],p[k])),'num')+cell(xlsPct(dp(a[k],y[k])),'num')+'</tr>'});kpi+='</tbody></table>';sections.push(kpi);let rateHtml='<h2>总体指标达成情况</h2><table><thead><tr class="group"><th>指标</th><th>方向</th><th>实际</th><th>预算</th><th>偏差：实际-预算</th><th>环比差</th><th>同比差</th><th>判断</th></tr></thead><tbody>';orderedRates().forEach(function(rd){let av=rate(a,rd),bv=rate(b,rd),pv=rate(p,rd),yv=rate(y,rd),diff=(av||0)-(bv||0),ok=rateOk(rd,diff);rateHtml+='<tr>'+cell(rd[1],'txt label')+cell(rateDir(rd),'txt')+cell(xlsPct(av),'num')+cell(xlsPct(bv),'num')+cell(xlsPp(diff),'num '+rateClass(rd,diff))+cell(xlsPp((av||0)-(pv||0)),'num')+cell(xlsPp((av||0)-(yv||0)),'num')+cell(ok?'达标/改善':'需关注',ok?'good':'bad')+'</tr>'});rateHtml+='</tbody></table>';sections.push(rateHtml);let segHtml='<h2>'+htmlEsc(dimCN[d])+'细分汇总</h2><table><thead><tr class="group"><th rowspan="2">'+htmlEsc(dimCN[d])+'</th>';am.forEach(function(m){segHtml+='<th colspan="5">'+htmlEsc(m[1])+'</th>'});segHtml+='</tr><tr class="subhead">';am.forEach(function(){segHtml+=th('实际')+th('预算')+th('达成')+th('环比')+th('同比')});segHtml+='</tr></thead><tbody>';let mp=new Map([['总计',c],...grp(c,d)]);for(let pair of mp){let lab=pair[0],rs=pair[1],aa=sum(rs),bb=sum(rs,'budget'),ppv=sum(byPairs(prev(ms),v,d,lab==='总计'?undefined:lab)),yy=sum(byPairs(yoy(ms),v,d,lab==='总计'?undefined:lab));segHtml+='<tr>'+cell(lab,'txt label');am.forEach(function(m){let k=m[0];segHtml+=cell(xlsMetric(aa[k],m[2]),'num')+cell(xlsMetric(bb[k],m[2]),'num')+cell(xlsPct(div(aa[k],bb[k])),'num')+cell(xlsPct(dp(aa[k],ppv[k])),'num')+cell(xlsPct(dp(aa[k],yy[k])),'num')});segHtml+='</tr>'}segHtml+='</tbody></table>';sections.push(segHtml);dlXls(title+'.xls',xlsDoc('预算达成汇总导出',sections))}
+init();
+</script>
+</body>
+</html>
