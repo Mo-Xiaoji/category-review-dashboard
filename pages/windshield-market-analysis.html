@@ -1084,18 +1084,36 @@ function competitionLandscapeData(records, months) {
 function heatCellHtml(cell, mode, stats, totalCell=false) {
   const c=cell || blankLandscapeCell();
   if(!c.qty && mode!=='km') return '<div class="heatCell empty">\u2014</div>';
-  if(mode==='km' && !c.kemQty) return '<div class="heatCell empty">0.0%</div>';
   let main='', sub='', ratio=0, color='91,141,239';
   const top=topBrandOfCell(c), topShare=c.qty?top.qty/c.qty:null, kmInCell=c.qty?c.kemQty/c.qty:null;
-  if(mode==='market') { ratio=stats.total.qty?c.qty/stats.total.qty:0; main=pctFine(ratio); color='91,141,239'; ratio=ratio/stats.maxMarket; }
-  else if(mode==='km') { ratio=totalCell ? (stats.total.kemQty?c.kemQty/stats.total.kemQty:0) : (kmInCell||0); main=pctFine(ratio); color='57,217,138'; ratio=totalCell ? ratio/stats.maxKm : ratio; }
-  else { ratio=topShare||0; main=short(displayBrandName(top.name),10); sub=pctFine(topShare); color=String(top.name||'').toUpperCase()==='KEMIMOTO'?'57,217,138':'255,180,84'; }
+  const marketShareOfTotal=stats.total.qty?c.qty/stats.total.qty:0;
+  const kmShareOfTotal=stats.total.kemQty?c.kemQty/stats.total.kemQty:0;
+  if(mode==='market') {
+    // 市场表现：该二级车型 × 价格段的市场销量 / 当前筛选市场总销量
+    ratio=marketShareOfTotal;
+    main=pctFine(marketShareOfTotal);
+    sub=compact(c.qty)+'件';
+    color='91,141,239';
+    ratio=ratio/stats.maxMarket;
+  } else if(mode==='km') {
+    // KM表现：该二级车型 × 价格段的 KEMIMOTO 销量 / KEMIMOTO 当前筛选总销量
+    ratio=kmShareOfTotal;
+    main=pctFine(kmShareOfTotal);
+    sub=compact(c.kemQty)+'件';
+    color='57,217,138';
+    ratio=stats.maxKm?ratio/stats.maxKm:0;
+  } else {
+    // Top品牌：该二级车型 × 价格段下销量第一品牌，以及该品牌在格内的销量份额
+    ratio=topShare||0;
+    main=short(displayBrandName(top.name),10);
+    sub=pctFine(topShare);
+    color=String(top.name||'').toUpperCase()==='KEMIMOTO'?'57,217,138':'255,180,84';
+  }
   const alpha=Math.max(.08, Math.min(.86, .10 + ratio*.68));
-  const title=`市场销量占比 ${pctFine(stats.total.qty?c.qty/stats.total.qty:0)}；KM格内渗透率 ${pctFine(kmInCell)}；Top品牌 ${displayBrandName(top.name)}，格内销量份额 ${pctFine(topShare)}`;
+  const title=`市场销量 ${compact(c.qty)}件；市场格局份额 ${pctFine(marketShareOfTotal)}；KM销量 ${compact(c.kemQty)}件；KM格局份额 ${pctFine(kmShareOfTotal)}；KM格内渗透率 ${pctFine(kmInCell)}；Top品牌 ${displayBrandName(top.name)}，格内销量份额 ${pctFine(topShare)}`;
   const subHtml=sub?`<div class="sub">${sub}</div>`:'';
-  return `<div class="heatCell" title="${title}" style="background:rgba(${color},${alpha})"><div class="main">${main}</div>${subHtml}</div>`;
+  return `<div class="heatCell ${mode==='km' && !c.kemQty?'empty':''}" title="${title}" style="background:rgba(${color},${alpha})"><div class="main">${main}</div>${subHtml}</div>`;
 }
-
 function landscapeCellItems(stats) {
   return [...stats.cells.entries()].map(([k,c])=>{ const parts=k.split('||'); return {band:parts[0], model:parts[1], cell:c}; }).filter(x=>x.cell.qty>0);
 }
@@ -1115,9 +1133,28 @@ function renderLandscapeInsights(stats, mode) {
   const noKmBand=[...stats.rowTotals.entries()].filter(x=>x[1].qty>0 && !x[1].kemQty).sort((a,b)=>b[1].qty-a[1].qty)[0];
   const noKmCell=items.filter(x=>x.cell.qty>0 && !x.cell.kemQty).sort((a,b)=>b.cell.qty-a.cell.qty)[0];
   const oppModelMap=new Map();
-  items.forEach(x=>{ const kmShare=x.cell.qty?x.cell.kemQty/x.cell.qty:0; if(x.cell.qty>0 && kmShare<oppThreshold) { if(!oppModelMap.has(x.model)) oppModelMap.set(x.model,{model:x.model,qty:0,kemQty:0,bands:[]}); const o=oppModelMap.get(x.model); o.qty+=x.cell.qty; o.kemQty+=x.cell.kemQty; o.bands.push({band:x.band,qty:x.cell.qty,kmShare}); } });
-  const opportunityModels=[...oppModelMap.values()].map(o=>{ o.marketShare=stats.total.qty?o.qty/stats.total.qty:0; o.kmShare=o.qty?o.kemQty/o.qty:0; o.gap=Math.max(0, kmOverallQtyShare-o.kmShare); o.bands.sort((a,b)=>b.qty-a.qty); o.topBand=o.bands[0]?.band||''; o.topBandShare=stats.total.qty&&o.bands[0]?o.bands[0].qty/stats.total.qty:0; o.score=o.qty*(o.gap+0.01); return o; }).sort((a,b)=>b.score-a.score).slice(0,3);
-  const opportunityModelText=opportunityModels.length ? opportunityModels.map((o,i)=>`${i+1}. <b>${o.model}</b>（车型整体市场销量占比 ${pctFine(o.marketShare)}，主价格段 ${o.topBand} 该格占比 ${pctFine(o.topBandShare)}，KM渗透率 ${pctFine(o.kmShare)}，参考KM整体 ${pctFine(kmOverallQtyShare)}）`).join('；') : '';
+  items.forEach(x=>{
+    const kmShare=x.cell.qty?x.cell.kemQty/x.cell.qty:0;
+    if(x.cell.qty>0 && kmShare<oppThreshold) {
+      if(!oppModelMap.has(x.model)) oppModelMap.set(x.model,{model:x.model,qty:0,kemQty:0,bands:[]});
+      const o=oppModelMap.get(x.model);
+      o.qty+=x.cell.qty;
+      o.kemQty+=x.cell.kemQty;
+      o.bands.push({band:x.band,qty:x.cell.qty,kmShare});
+    }
+  });
+  const opportunityModels=[...oppModelMap.values()].map(o=>{
+    o.opportunityShare=stats.total.qty?o.qty/stats.total.qty:0;
+    o.kmShare=o.qty?o.kemQty/o.qty:0;
+    o.gap=Math.max(0, kmOverallQtyShare-o.kmShare);
+    o.bands.sort((a,b)=>b.qty-a.qty);
+    o.topBand=o.bands[0]?.band||'';
+    o.topBandShare=stats.total.qty&&o.bands[0]?o.bands[0].qty/stats.total.qty:0;
+    o.topBandKmShare=o.bands[0]?.kmShare ?? null;
+    o.score=o.qty*(o.gap+0.01);
+    return o;
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+  const opportunityModelText=opportunityModels.length ? opportunityModels.map((o,i)=>`${i+1}. <b>${o.model}</b>：重点机会价格段 <b>${o.topBand}</b>，该格市场占比 <b>${pctFine(o.topBandShare)}</b>，KM渗透率 <b>${pctFine(o.topBandKmShare)}</b>，低于参考线 <b>${pctFine(kmOverallQtyShare)}</b>`).join('；') : '';
   const topBrandCells=items.map(x=>{ const b=topBrandOfCell(x.cell); return {...x, top:b, topShare:x.cell.qty?b.qty/x.cell.qty:0}; });
   const topDominant=topBrandCells.slice().sort((a,b)=>b.topShare-a.topShare)[0];
   const kmTopCount=topBrandCells.filter(x=>String(x.top.name||'').toUpperCase()==='KEMIMOTO').length;
@@ -1132,7 +1169,6 @@ function renderLandscapeInsights(stats, mode) {
   if(kmMain && topCell && (kmMain.model!==topCell.model || kmMain.band!==topCell.band) && kmMainConcentration>=0.4) danger.push(`KM 结构集中风险：KM 销量集中在 <b>${kmMain.model} × ${kmMain.band}</b>（占 KM 总销量 <b>${pctFine(kmMainConcentration)}</b>），但市场最大格是 <b>${topCell.model} × ${topCell.band}</b>，需关注布局是否偏离市场主流。`);
   const dangerText=danger.length?`危险点分析：${danger.slice(0,3).join(' ')}`:'';
   const lines=[];
-  lines.push(`口径说明：重点机会车型=按二级车型汇总（包含该车型所有价格段）。市场销量占比=该车型销量/当前筛选市场总销量；KM渗透率=KM在该车型内的销量份额。机会判断看“市场有量且KM渗透率低于KM整体水平/无布局”。`);
   if(opportunityModelText) lines.push(`重点机会车型 Top3：${opportunityModelText}。`);
   if(dangerText) lines.push(dangerText);
   if(mode==='market') {
@@ -1160,7 +1196,7 @@ function renderCompetitionLandscape(records, months) {
   const el=document.getElementById('landscapeTable'); if(!el) return;
   const stats=competitionLandscapeData(records, months), mode=state.competitionView||'market';
   document.querySelectorAll('#landscapeTabs button').forEach(b=>b.classList.toggle('active', b.dataset.landscape===mode));
-  const hint={market:'市场表现：单元格仅展示该二级车型 × 价格段的市场销量份额。', km:'KM 表现：单元格仅展示 KM 在该格内的销量份额；汇总列/行展示 KM 销量分布份额。', top:'Top 品牌：单元格展示该格销量第一品牌名称及其销量份额。'};
+  const hint={market:'市场表现：单元格展示该二级车型 × 价格段的市场销量占当前筛选市场总销量的份额。', km:'KM 表现：单元格展示 KEMIMOTO 在该二级车型 × 价格段的销量占 KEMIMOTO 当前筛选总销量的份额。', top:'Top 品牌：单元格展示该二级车型 × 价格段下销量第一的品牌，以及该品牌在格内的销量份额。'};
   document.getElementById('landscapeHint').textContent=hint[mode];
   if(!stats.total.qty) { el.innerHTML='<tbody><tr><td class="empty">暂无数据</td></tr></tbody>'; return; }
   const head='<thead><tr><th>价格段</th><th>汇总</th>'+stats.cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead>';
