@@ -1,0 +1,858 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>挡风类目复盘数据网站｜类目搜索词分析</title>
+  <style>
+    :root{
+      --bg:#f6f8fb; --panel:#ffffff; --ink:#142033; --muted:#5d6b82; --subtle:#e8edf5;
+      --brand:#2454d6; --brand2:#02a88a; --warn:#e58a00; --danger:#d64242; --good:#0a9f6b;
+      --purple:#8057d5; --sky:#2aa7ff; --shadow:0 18px 50px rgba(20,32,51,.10);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif; color:var(--ink); background:linear-gradient(180deg,#edf3ff 0,#f8fafc 320px,var(--bg));}
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(1180px,calc(100% - 36px)); margin:0 auto;}
+    header.hero{padding:44px 0 30px; position:relative; overflow:hidden;}
+    header.hero:before{content:""; position:absolute; right:-120px; top:-140px; width:520px; height:520px; background:radial-gradient(circle,#91c8ff 0,#dbeafe 42%,transparent 70%); opacity:.55;}
+    .badge{display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border:1px solid #dbe5f5; background:rgba(255,255,255,.72); border-radius:999px; color:#31506e; font-weight:700; font-size:13px; backdrop-filter:blur(8px)}
+    .hero-grid{display:grid; grid-template-columns:1.4fr .9fr; gap:24px; align-items:end; position:relative; z-index:1;}
+    h1{font-size:46px; line-height:1.08; margin:18px 0 12px; letter-spacing:-.04em;}
+    .lead{font-size:17px; line-height:1.8; color:#42526a; max-width:760px; margin:0;}
+    .hero-card{background:rgba(255,255,255,.80); border:1px solid #dfe7f2; border-radius:26px; padding:22px; box-shadow:var(--shadow); backdrop-filter:blur(10px)}
+    .hero-card h3{margin:0 0 16px; font-size:16px; color:#394961}.mini-row{display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid #edf1f7; gap:18px}.mini-row:first-of-type{border-top:0}.mini-label{color:#65748b}.mini-val{font-weight:800}
+    nav{position:sticky; top:0; z-index:5; background:rgba(246,248,251,.85); backdrop-filter:blur(14px); border-top:1px solid #e7edf6; border-bottom:1px solid #e7edf6;}
+    nav .wrap{display:flex; gap:8px; overflow:auto; padding:10px 18px;} nav a{white-space:nowrap; padding:10px 14px; border-radius:999px; color:#44546a; font-weight:700; font-size:14px} nav a:hover{background:#fff;color:var(--brand)}
+    section{padding:34px 0;} .section-title{display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:18px;} h2{font-size:28px; margin:0; letter-spacing:-.02em;} .subtitle{margin:6px 0 0; color:var(--muted); line-height:1.7}.grid{display:grid; gap:18px}.grid.kpi{grid-template-columns:repeat(4,1fr)} .grid.two{grid-template-columns:1.15fr .85fr}.grid.three{grid-template-columns:repeat(3,1fr)}
+    .card{background:var(--panel); border:1px solid var(--subtle); border-radius:var(--radius); padding:20px; box-shadow:0 8px 24px rgba(20,32,51,.05)} .card h3{margin:0 0 12px; font-size:18px}.card p{color:#536177; line-height:1.75}.kpi-card{position:relative; overflow:hidden}.kpi-card:after{content:""; position:absolute; width:96px; height:96px; right:-40px; top:-42px; border-radius:50%; background:rgba(36,84,214,.10)}.kpi-label{color:#66758b; font-size:13px; font-weight:700}.kpi-value{font-size:30px; font-weight:900; margin:10px 0 4px}.delta{font-size:13px; font-weight:800}.up{color:var(--good)}.down{color:var(--danger)}.flat{color:#607089}.note{padding:12px 14px; background:#f8fafc; border:1px solid #edf1f7; border-radius:14px; color:#4f5f75; line-height:1.7}.pill{display:inline-flex; padding:5px 9px; border-radius:999px; background:#eef4ff; color:#2454d6; font-weight:800; font-size:12px}.pill.good{background:#e9f8f3;color:#087a55}.pill.warn{background:#fff5e6;color:#a96000}.pill.danger{background:#fff0f0;color:#bd3030}.muted{color:var(--muted)}
+    .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}.tab{border:1px solid #dfe7f2; background:#fff; border-radius:12px; padding:9px 12px; cursor:pointer; font-weight:800; color:#42526a}.tab.active{background:#1749cc; color:#fff; border-color:#1749cc}.defs{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}.def{background:#f8fafc; border:1px solid #e8edf5; border-radius:16px; padding:14px}.def b{display:block; margin-bottom:7px}.def span{color:#5b6880; line-height:1.6; font-size:13px}
+    .chart{width:100%; min-height:300px}.chart svg{width:100%; height:auto; display:block}.axis text{fill:#718096; font-size:12px}.axis line,.axis path{stroke:#dbe3ef}.gridline{stroke:#eef2f7}.line{fill:none; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round}.dot{stroke:#fff; stroke-width:2}.label{font-size:12px; fill:#344155; font-weight:700}.legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; color:#607089; font-size:13px}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+    .table-tools{display:flex; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap}.searchbox{border:1px solid #dce4f1; border-radius:12px; padding:10px 12px; min-width:260px; background:#fff}table{width:100%; border-collapse:separate; border-spacing:0; font-size:13px}th,td{padding:11px 10px; border-bottom:1px solid #edf1f7; text-align:left; vertical-align:top}th{position:sticky; top:51px; background:#fff; z-index:2; color:#516176; font-size:12px}tr:hover td{background:#fafcff}.table-wrap{overflow:auto; max-height:520px; border:1px solid #edf1f7; border-radius:16px} .num{text-align:right; font-variant-numeric:tabular-nums}.spark{width:130px; height:34px}.select{border:1px solid #dce4f1; border-radius:12px; padding:10px 12px; background:#fff; min-width:280px}
+    .funnel-list{display:grid; gap:10px}.funnel-row{display:grid; grid-template-columns:250px 1fr; gap:12px; align-items:center; padding:10px; border:1px solid #edf1f7; border-radius:16px}.funnel-name{font-weight:800; font-size:13px}.funnel-bars{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}.fbar{background:#f1f5fb; border-radius:10px; overflow:hidden; min-height:34px; position:relative}.fbar span{display:block; height:100%; border-radius:10px; min-width:2px}.fbar em{position:absolute; left:8px; top:8px; font-style:normal; font-size:12px; font-weight:800; color:#1b2840; text-shadow:0 1px 0 rgba(255,255,255,.6)}
+    .insight-list{display:grid; grid-template-columns:1fr; gap:12px}.insight{border-radius:18px; border:1px solid #e5ebf4; padding:15px 15px 15px 18px; background:#fff; position:relative; overflow:hidden}.insight:before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--good)}.insight.risk:before{background:var(--danger)}.insight h4{margin:0 0 8px; font-size:15px}.insight p{margin:0; font-size:13px; color:#59677c; line-height:1.65}.insight small{display:inline-block; margin-top:10px; font-weight:800; color:#314259}.insight .tag{margin-top:10px}.insight .meta-line{display:flex; flex-wrap:wrap; gap:6px; margin:9px 0}.insight .rank{display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:28px; border-radius:999px; background:#edf4ff; color:#2454d6; font-weight:900; margin-right:8px}.market-card{display:flex; flex-direction:column; gap:10px}.market-head{display:flex; justify-content:space-between; gap:12px}.market-title{font-weight:900}.metric-line{height:8px; border-radius:999px; background:#edf2f8; overflow:hidden}.metric-line span{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--brand),var(--brand2))}.footer{padding:26px 0 46px; color:#718096; font-size:13px}.summary-callout{background:linear-gradient(135deg,#173b93,#0e8272); color:#fff; border:0}.summary-callout p,.summary-callout .muted{color:rgba(255,255,255,.82)}.summary-callout .pill{background:rgba(255,255,255,.16); color:#fff}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+
+    .panorama{display:grid; gap:10px}.panorama-row{display:grid; grid-template-columns:250px 1fr 120px; gap:12px; align-items:center; padding:12px; border:1px solid #edf1f7; border-radius:16px; background:#fff}.stage-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}.stage-cell{background:#f5f7fb; border-radius:12px; padding:8px; min-height:56px}.stage-cell b{display:block; font-size:12px; color:#5c6b82; margin-bottom:4px}.stage-cell span{font-weight:900; font-variant-numeric:tabular-nums}.stage-cell.weak{outline:2px solid rgba(214,66,66,.22); background:#fff4f4}.stage-cell.strong{outline:2px solid rgba(10,159,107,.18); background:#effaf6}.diagnosis-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}.diagnosis{border:1px solid #e5ebf4; border-radius:18px; padding:15px; background:#fff}.diagnosis h4{margin:0 0 8px; font-size:15px}.diagnosis p{margin:0; color:#59677c; line-height:1.65; font-size:13px}.diagnosis .tag{display:inline-flex; margin-top:10px; padding:5px 9px; border-radius:999px; background:#eef4ff; color:#2454d6; font-size:12px; font-weight:800}.diagnosis.risk .tag{background:#fff0f0;color:#bd3030}.diagnosis.good .tag{background:#e9f8f3;color:#087a55}
+
+    @media(max-width:900px){.hero-grid,.grid.two,.grid.three,.grid.kpi,.defs,.insight-list,.diagnosis-grid{grid-template-columns:1fr}.funnel-row,.panorama-row{grid-template-columns:1fr}.funnel-bars,.stage-grid{grid-template-columns:1fr 1fr}h1{font-size:34px}.section-title{display:block}th{top:0}}
+  
+    /* 分页展示：点击导航只展示对应模块，避免页面过长 */
+    .page-tabs{top:45px; z-index:30;}
+    .page-tabs a.active{background:#fff;color:var(--brand);box-shadow:0 8px 20px rgba(36,84,214,.12);}
+    .analysis-page.is-hidden{display:none;}
+    .analysis-page.active-page{display:block;}
+  </style>
+<!-- unified-category-theme:start -->
+<style>
+  :root{
+    --hub-bg:#eef4fb;
+    --hub-bg-2:#f4f7fb;
+    --hub-surface:#f8fbff;
+    --hub-surface-2:#f1f6fd;
+    --hub-ink:#111827;
+    --hub-muted:#475569;
+    --hub-blue:#2563eb;
+    --hub-blue-2:#1d4ed8;
+    --hub-blue-dark:#172554;
+    --hub-line:#d6e1ef;
+    --hub-soft:#eaf2ff;
+    --hub-shadow:0 12px 30px rgba(15,23,42,.08);
+    --hub-radius:22px;
+  }
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 8% 0%,rgba(96,165,250,.16),transparent 34%),
+      radial-gradient(circle at 92% 8%,rgba(37,99,235,.10),transparent 30%),
+      linear-gradient(180deg,#e3edf8 0,#eef4fb 360px,#f4f7fb 100%)!important;
+    color:var(--hub-ink)!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
+  }
+  body a{color:var(--hub-blue);}
+
+  /* 全站顶部导航 */
+  .multipage-site-nav,.topnav{
+    position:sticky!important;top:0!important;z-index:9999!important;
+    background:rgba(248,251,255,.94)!important;backdrop-filter:blur(16px)!important;
+    border-bottom:1px solid var(--hub-line)!important;box-shadow:0 8px 24px rgba(15,23,42,.06)!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
+  }
+  .multipage-site-nav .inner,.topnav .navin{max-width:1280px!important;margin:0 auto!important;padding:10px 24px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;}
+  .multipage-site-nav .title,.topnav .brand{font-size:15px!important;font-weight:900!important;color:var(--hub-blue-dark)!important;letter-spacing:.01em!important;white-space:nowrap!important;}
+  .multipage-site-nav .links,.topnav .navlinks{display:flex!important;gap:8px!important;flex-wrap:wrap!important;}
+  .multipage-site-nav a,.topnav a{display:inline-flex!important;align-items:center!important;text-decoration:none!important;color:#334155!important;background:#fff!important;border:1px solid var(--hub-line)!important;border-radius:999px!important;padding:8px 12px!important;font-size:13px!important;line-height:1!important;font-weight:760!important;box-shadow:none!important;}
+  .multipage-site-nav a:hover,.topnav a:hover{color:var(--hub-blue)!important;background:var(--hub-soft)!important;border-color:#b7cff7!important;}
+
+  /* 页面标题区统一为深蓝渐变，强化辨识度 */
+  body>section.hero,body>header.hero,main.shell>header.hero,body>.wrap>header,body.page-market header{
+    background:linear-gradient(135deg,#172554 0%,#1e40af 58%,#3b82f6 100%)!important;
+    color:#fff!important;border:1px solid rgba(255,255,255,.14)!important;
+    box-shadow:0 18px 45px rgba(30,64,175,.18)!important;
+  }
+  body>section.hero,body>header.hero{padding:42px 28px 34px!important;}
+  main.shell>header.hero,body>.wrap>header,body.page-market header{border-radius:28px!important;padding:30px!important;margin:22px 0 20px!important;}
+  body>section.hero .wrap,body>header.hero .wrap{max-width:1280px!important;}
+  body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1,.hero h1{color:#fff!important;font-size:34px!important;line-height:1.18!important;letter-spacing:-.02em!important;font-weight:900!important;}
+  body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,main.shell>header.hero .subtitle,body.page-market header p,.hero p{color:#dbeafe!important;line-height:1.75!important;}
+  body>.wrap>header .badge,main.shell>header.hero .badge,.hero .badge,body.page-market header .badge,.eyebrow{background:rgba(255,255,255,.14)!important;color:#dbeafe!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:999px!important;}
+
+  /* 内容卡片：统一浅蓝白，减少纯白刺眼，同时保证文字对比度 */
+  body :where(.card,.kpi-card,.mini,.share-card,.kem-bs-card,.product,.table-card,.toolbar,.filters,.table-wrap,.tableBox,.summary-box,.formula-box){
+    background:linear-gradient(180deg,var(--hub-surface) 0%,var(--hub-surface-2) 100%)!important;
+    color:var(--hub-ink)!important;
+    border-color:var(--hub-line)!important;
+    box-shadow:var(--hub-shadow)!important;
+  }
+  body :where(.kpi,.kpis .kpi){
+    background:linear-gradient(180deg,#fbfdff 0%,#f0f6fd 100%)!important;
+    color:var(--hub-ink)!important;
+    border-color:var(--hub-line)!important;
+    box-shadow:var(--hub-shadow)!important;
+  }
+  body :where(h1,h2,h3,h4,.value,.kpi-value,.share-brand,.kem-bs-title){color:var(--hub-ink)!important;}
+  body :where(.hero h1,header h1,body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1){color:#fff!important;}
+  body :where(.muted,.subtitle,.hint,.kpi-label,.kpi-sub,.kpi .name,.kpi .delta,.sub,.share-label,.kem-bs-label,.meta,small){color:var(--hub-muted)!important;}
+  body :where(.hero .subtitle,body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,body.page-market header p){color:#dbeafe!important;}
+
+  /* 筛选与分页：统一底色，但保留状态色、业务标签、图表颜色 */
+  body :where(select,input){background:#f8fbff!important;color:var(--hub-ink)!important;border-color:#cbd5e1!important;}
+  body :where(.page-tabs,.pageTabs,.tabs,.filters,.toolbar){background:rgba(248,251,255,.88)!important;backdrop-filter:blur(14px)!important;border-color:var(--hub-line)!important;}
+  body :where(.tab,.mode-tab,.page-tabs a,.pageTabs button,.switches button,.pager button){background:#f8fbff!important;color:#334155!important;border-color:var(--hub-line)!important;}
+  body :where(.tab.active,.mode-tab.active,.page-tabs a.active,.pageTabs button.active,.switches button.active){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
+  body :where(button.primary,.btn.primary){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
+
+  /* 表格：统一可读性 */
+  body table{background:#f8fbff!important;color:var(--hub-ink)!important;}
+  body th{background:#eaf1fa!important;color:#263447!important;border-bottom-color:var(--hub-line)!important;}
+  body td{color:#111827!important;border-bottom-color:#dfe8f3!important;}
+  body tbody tr:nth-child(even) td{background:#f3f7fd!important;}
+  body tbody tr:hover td{background:#eef5ff!important;}
+  body :where(td:first-child,th:first-child){background:#eef5fc!important;}
+  body :where(tbody tr:hover td:first-child){background:#eef5ff!important;}
+
+  /* 硬挡风页原来是深色图表，统一浅色后单独补强图表轴线、说明条和热力表清晰度 */
+  body.page-market{--text:var(--hub-ink);--muted:#526071;--grid:#d8e3f0;--panel:var(--hub-surface);--panel2:var(--hub-surface-2);--card:var(--hub-surface);}
+  body.page-market .fieldGuide{background:#e6f6fb!important;color:#174151!important;border-color:#9bd9e7!important;}
+  body.page-market .fieldGuide b{color:#0f3a4a!important;}
+  body.page-market .axis{stroke:#64748b!important;opacity:.75!important;}
+  body.page-market .gridline{stroke:#d8e3f0!important;opacity:1!important;}
+  body.page-market svg text{fill:#526071!important;}
+  body.page-market .dot{stroke:#f8fbff!important;}
+  body.page-market .heatCell{border-color:#d8e3f0!important;color:#111827!important;}
+  body.page-market .pill{background:#eaf2ff!important;color:#1d4ed8!important;}
+  body.page-market .pos{color:#059669!important;}
+  body.page-market .neg{color:#dc2626!important;}
+
+  @media(max-width:820px){.multipage-site-nav .inner,.topnav .navin{align-items:flex-start!important;flex-direction:column!important}.multipage-site-nav .links,.topnav .navlinks{width:100%!important;overflow:auto!important;flex-wrap:nowrap!important}.hero h1,body>section.hero h1,body>header.hero h1,body.page-market header h1{font-size:28px!important}}
+</style>
+<!-- unified-category-theme:end -->
+<!-- readability-audit-fix:start -->
+<style>
+  body.page-search{--good:#047857;--danger:#b91c1c;--muted:#475569;}
+  body.page-search header.hero .badge{background:rgba(15,23,42,.28)!important;border-color:rgba(255,255,255,.28)!important;color:#ffffff!important;text-shadow:0 1px 2px rgba(0,0,0,.18)!important;}
+  body.page-search .up{color:#047857!important;font-weight:900!important;}
+  body.page-search .down{color:#b91c1c!important;font-weight:900!important;}
+  body.page-search .pill.good{background:#dcfce7!important;color:#166534!important;font-weight:900!important;}
+  body.page-search .pill.warn{background:#fef3c7!important;color:#92400e!important;font-weight:900!important;}
+  body.page-search .pill.danger{background:#fee2e2!important;color:#991b1b!important;font-weight:900!important;}
+  body.page-search .muted,
+  body.page-search .subtitle,
+  body.page-search .legend,
+  body.page-search .footer,
+  body.page-search .kpi-label,
+  body.page-search .flat,
+  body.page-search .card p,
+  body.page-search .insight p,
+  body.page-search .diagnosis p,
+  body.page-search .def span{color:#475569!important;}
+  body.page-search .axis text,
+  body.page-search svg text[fill="#475569"]{fill:#475569!important;}
+  body.page-search .summary-callout .pill{background:#eaf2ff!important;color:#1d4ed8!important;font-weight:900!important;}
+  body.page-search .summary-callout p{color:#334155!important;}
+  /* keyword-table-header-fix: 避免固定表头遮住第一行关键词 */
+  body.page-search .table-wrap th{top:0!important;background:#eef4fb!important;box-shadow:0 1px 0 #d7e2f0!important;}
+  body.page-search #kwTable tbody tr:first-child td{background:#f7fbff!important;}
+</style>
+<!-- readability-audit-fix:end -->
+</head>
+<body class="page-search">
+<style>
+.multipage-site-nav{position:sticky!important;top:0!important;z-index:9999!important;background:rgba(255,255,255,.94)!important;backdrop-filter:blur(16px)!important;border-bottom:1px solid #e5eaf2!important;box-shadow:0 8px 28px rgba(15,23,42,.06)!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important}
+.multipage-site-nav .inner{max-width:1280px!important;margin:0 auto!important;padding:10px 24px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important}
+.multipage-site-nav .title{font-size:15px!important;font-weight:900!important;color:#172554!important;white-space:nowrap!important}
+.multipage-site-nav .links{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+.multipage-site-nav a{display:inline-flex!important;align-items:center!important;text-decoration:none!important;color:#334155!important;background:#fff!important;border:1px solid #e5eaf2!important;border-radius:999px!important;padding:8px 12px!important;font-size:13px!important;line-height:1!important;font-weight:750!important}
+.multipage-site-nav a:hover{color:#2563eb!important;background:#eff6ff!important;border-color:#bfdbfe!important}
+@media(max-width:760px){.multipage-site-nav .inner{align-items:flex-start!important;flex-direction:column!important}.multipage-site-nav .links{width:100%!important;overflow:auto!important;flex-wrap:nowrap!important}}
+</style>
+<div class="multipage-site-nav">
+  <div class="inner">
+    <div class="title">品类复盘中心</div>
+    <div class="links">
+      <a href="../index.html">总览首页</a>
+      <a href="./aba-search-analysis.html">类目搜索词分析</a>
+      <a href="./bs-new-release-analysis/index.html">BS & 新品榜分析</a>
+      <a href="./windshield-market-analysis.html">硬挡风市场分析</a>
+      <a href="./budget-achievement-analysis/index.html">预算达成分析</a>
+    </div>
+  </div>
+</div>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="badge">ABA × 细分市场搜索结果｜挡风类目复盘</div>
+        <h1>类目搜索词分析</h1>
+      </div>
+    </div>
+  </header>
+  <nav class="page-tabs"><div class="wrap"><a href="#trend" data-page="trend" class="active">搜索趋势情况</a><a href="#brand" data-page="brand">品牌漏斗</a><a href="#segments" data-page="segments">细分市场</a><a href="#opprisk" data-page="opprisk">机会&危险点</a></div></nav>
+
+  <main class="wrap">
+    <section id="demand" class="analysis-page">
+      <div class="section-title"><div><h2>搜索趋势情况</h2><p class="subtitle">合并展示整体搜索需求、淡旺季变化，以及具体搜索词趋势与环比/同比。</p></div></div>
+      <div class="grid kpi">
+        <div class="card kpi-card"><div class="kpi-label">2026Q2搜索查询量</div><div class="kpi-value" id="kpiSearch"></div><div class="delta up" id="kpiSearchDelta"></div></div>
+        <div class="card kpi-card"><div class="kpi-label">购买次数</div><div class="kpi-value" id="kpiPurchases"></div><div class="delta" id="kpiPurchDelta"></div></div>
+        <div class="card kpi-card"><div class="kpi-label">搜索→加购率</div><div class="kpi-value" id="kpiCartRate"></div><div class="delta flat">反映中段意向承接</div></div>
+        <div class="card kpi-card"><div class="kpi-label">点击→购买率</div><div class="kpi-value" id="kpiC2P"></div><div class="delta flat">后段转化质量</div></div>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="card"><h3>季度趋势</h3><div id="trendChart" class="chart"></div><div class="legend"><span><i style="background:#2454d6"></i>搜索查询量</span><span><i style="background:#02a88a"></i>购买次数</span></div></div>
+        <div class="card"><h3>淡旺季判断</h3><div id="seasonText"></div></div>
+      </div>
+    </section>
+
+    <section id="keywords" class="analysis-page">
+      <div class="section-title"><div><h2>具体搜索词趋势与环比/同比</h2><p class="subtitle">当期为2026Q2；环比对比2026Q1，同比对比2025Q2。可搜索关键词查看趋势。</p></div></div>
+      <div class="card">
+        <div class="table-tools"><input id="kwSearch" class="searchbox" placeholder="搜索关键词，如 polaris / golf / can am"/><span class="pill">按2026Q2搜索量降序</span><span id="kwCount" class="muted">展示2026Q2全部关键词，已剔除品类大词 windshield</span></div>
+        <div class="table-wrap"><table id="kwTable"><thead><tr><th>搜索词</th><th class="num">2026Q2搜索量</th><th class="num">环比</th><th class="num">同比</th><th>6季度趋势</th><th class="num">点击</th><th class="num">加购</th><th class="num">购买</th><th class="num">购买率</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="brand" class="analysis-page">
+      <div class="section-title"><div><h2>搜索词品牌表现：曝光 → 点击 → 加购 → 购买</h2><p class="subtitle">先看当期每个搜索词的品牌份额全景，再结合该搜索词在ABA中的搜索量环比和同比，判断品牌到底缺在曝光、点击、加购还是购买环节。</p></div></div>
+      <div class="card">
+        <div class="table-tools"><span class="pill">2026Q2品牌份额全景</span><span class="muted">诊断规则：先看相邻环节最大掉点（点击-曝光、加购-点击、购买-加购）；若无明显掉点，再结合ABA需求增长和链路承接判断是否可以放大前端曝光/搜索流量。市场搜索量表现统一取ABA当期搜索量、环比和同比。</span></div>
+        <div class="panorama" id="brandPanorama"></div>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="card"><h3>单词品牌份额链路诊断</h3><select id="funnelSelect" class="select"></select><div id="funnelDetail" style="margin-top:14px"></div></div>
+        <div class="card"><h3>结合ABA环比/同比后的环节不足判断</h3><div id="stageDiagnosis" class="diagnosis-grid"></div></div>
+      </div>
+
+    </section>
+
+    <section id="segments" class="analysis-page">
+      <div class="section-title"><div><h2>细分市场搜索结果分析</h2><p class="subtitle">从360天/90天搜索量、增长、销量区间、均价、价格带、退货率判断市场容量与进入质量。</p></div></div>
+      <div class="grid two">
+        <div class="card"><h3>细分市场：90天搜索量 × 90天增长</h3><div id="segmentBubble" class="chart"></div></div>
+        <div class="card"><h3>当期ABA词池结构</h3><div id="clusterChart" class="chart"></div><div class="note">2026Q2 ABA词池中，UTV/SxS相关词搜索份额约35%，Golf Cart约38%，UTV/SxS约48%，Motorcycle约14%；剔除品类大词后，词池结构更集中在具体车型/场景词。</div></div>
+      </div>
+      <div class="card" style="margin-top:18px"><h3>细分市场总结分析</h3><div id="segmentSummary" class="diagnosis-grid"></div></div>
+      <div class="card" style="margin-top:18px"><h3>细分市场明细</h3><div class="table-wrap"><table id="segTable"><thead><tr><th>细分市场</th><th class="num">90天搜索</th><th class="num">90天增长</th><th class="num">360天搜索</th><th class="num">180天增长</th><th class="num">销量区间</th><th class="num">均价</th><th class="num">价格带</th><th class="num">退货率</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="opprisk" class="analysis-page">
+      <div class="section-title"><div><h2>结合ABA与细分市场的机会点和危险点</h2><p class="subtitle">口径：同比=2026Q2 对比 2025Q2；同时参考 2025 Q2→Q3→Q4，判断 Q3-Q4 是否仍有承接窗口。</p></div></div>
+      <div class="card summary-callout" style="margin-bottom:18px"><span class="pill">结论摘要</span><p style="font-size:17px;line-height:1.7;margin:12px 0 0">优先看“同季变化 + 去年Q3-Q4走势”：Q2同比增长且去年Q3-Q4继续放大，按机会提前布局；Q2同比下滑但去年Q3-Q4本应放大，先排查曝光/排名/适配承接。短期关注 <b>golf cart windshield、motorcycle windshield extension、polaris ranger windshield、polaris ranger 1000 windshield</b>；谨慎处理 <b>rzr windshield、can am maverick x3 windshield、can am defender windshield</b>。</p></div>
+      <div class="card" style="margin-bottom:18px"><h3>判断规则</h3><p class="note"><b>机会：</b>同季增长 + 去年Q3-Q4放大。<br><b>风险：</b>同季下滑 + 去年Q3-Q4本应放大。<br><b>避免误判：</b>只看环比回落，不直接判定需求下滑。</p></div>
+      <div class="grid two">
+        <div><h3>机会点</h3><div class="insight-list" id="oppList"></div></div>
+        <div><h3>危险点</h3><div class="insight-list" id="riskList"></div></div>
+      </div>
+    </section>
+  </main>
+  <div class="footer wrap">数据来源：用户提供的 ABA数据_挡风类目.xlsx、细分市场搜索结果_2026_8_13.xlsx。网站为静态本地文件，可直接打开查看。</div>
+<script id="dataset" type="application/json">{"periods": ["2025Q1", "2025Q2", "2025Q3", "2025Q4", "2026Q1", "2026Q2"], "latestPeriod": "2026Q2", "overview": [{"period": "2025Q1", "year": 2025, "quarter": 1, "terms": 25, "search_volume": 76411, "impressions": 1814482, "clicks": 31351, "cart_adds": 4658, "purchases": 1238, "ctr_pct": 1.728, "cart_rate_pct": 6.096, "purchase_rate_pct": 1.62, "click_to_purchase_pct": 3.949, "qoq_search_pct": null, "yoy_search_pct": null}, {"period": "2025Q2", "year": 2025, "quarter": 2, "terms": 13, "search_volume": 75343, "impressions": 1825577, "clicks": 30758, "cart_adds": 4813, "purchases": 1362, "ctr_pct": 1.685, "cart_rate_pct": 6.388, "purchase_rate_pct": 1.808, "click_to_purchase_pct": 4.428, "qoq_search_pct": -1.398, "yoy_search_pct": null}, {"period": "2025Q3", "year": 2025, "quarter": 3, "terms": 15, "search_volume": 84457, "impressions": 2180317, "clicks": 32692, "cart_adds": 4445, "purchases": 1217, "ctr_pct": 1.499, "cart_rate_pct": 5.263, "purchase_rate_pct": 1.441, "click_to_purchase_pct": 3.723, "qoq_search_pct": 12.097, "yoy_search_pct": null}, {"period": "2025Q4", "year": 2025, "quarter": 4, "terms": 28, "search_volume": 116015, "impressions": 3159887, "clicks": 45277, "cart_adds": 6405, "purchases": 2062, "ctr_pct": 1.433, "cart_rate_pct": 5.521, "purchase_rate_pct": 1.777, "click_to_purchase_pct": 4.554, "qoq_search_pct": 37.366, "yoy_search_pct": null}, {"period": "2026Q1", "year": 2026, "quarter": 1, "terms": 23, "search_volume": 83658, "impressions": 2291709, "clicks": 32134, "cart_adds": 4197, "purchases": 1219, "ctr_pct": 1.402, "cart_rate_pct": 5.017, "purchase_rate_pct": 1.457, "click_to_purchase_pct": 3.793, "qoq_search_pct": -27.89, "yoy_search_pct": 9.484}, {"period": "2026Q2", "year": 2026, "quarter": 2, "terms": 15, "search_volume": 92803, "impressions": 2607330, "clicks": 31931, "cart_adds": 4424, "purchases": 1392, "ctr_pct": 1.225, "cart_rate_pct": 4.767, "purchase_rate_pct": 1.5, "click_to_purchase_pct": 4.359, "qoq_search_pct": 10.931, "yoy_search_pct": 23.174}], "overallStats": {"latestSearch": 92803, "latestPurchases": 1392, "qoqSearch": 10.93, "yoySearch": 23.17, "peakPeriod": "2025Q4", "peakSearch": 116015, "troughPeriod": "2025Q2", "troughSearch": 75343, "latestCtr": 1.22, "latestCartRate": 4.77, "latestPurchaseRate": 1.5, "latestClickToPurchase": 4.36}, "currentTerms": [{"period": "2026Q2", "year": 2026, "quarter": 2, "term": "golf cart windshield", "score": 149, "search_volume": 35071, "impressions": 929661, "brand_impressions": 76904, "brand_impression_share": 8.27, "clicks": 10745, "ctr": 30.64, "click_brand_count": 1129, "brand_click_share": 10.51, "click_price_median": 101.99, "brand_click_price_median": 27.99, "click_same_day": 38, "click_1day": 1882, "click_2day": 2734, "cart_adds": 1700, "cart_rate": 4.85, "cart_brand_count": 158, "brand_cart_share": 9.29, "cart_price_median": 99.99, "brand_cart_price_median": 27.99, "cart_same_day": 5, "cart_1day": 296, "cart_2day": 432, "purchases": 516, "purchase_rate": 1.47, "purchase_brand_count": 44, "brand_purchase_share": 8.53, "purchase_price_median": 101.99, "brand_purchase_price_median": 27.99, "purchase_same_day": 2, "purchase_1day": 130, "purchase_2day": 144, "cluster": "Golf Cart", "qoq_search_pct": 50.397, "yoy_search_pct": 20.226, "click_vs_impr": 2.24, "cart_vs_click": -1.22, "purchase_vs_cart": -0.76, "purchase_vs_impr": 0.26}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "motorcycle windshield extension", "score": 180, "search_volume": 12850, "impressions": 374162, "brand_impressions": 40278, "brand_impression_share": 10.76, "clicks": 5982, "ctr": 46.55, "click_brand_count": 1124, "brand_click_share": 18.79, "click_price_median": 28.69, "brand_click_price_median": 70.99, "click_same_day": 98, "click_1day": 1509, "click_2day": 1652, "cart_adds": 874, "cart_rate": 6.8, "cart_brand_count": 153, "brand_cart_share": 17.51, "cart_price_median": 26.83, "brand_cart_price_median": 70.99, "cart_same_day": 25, "cart_1day": 264, "cart_2day": 262, "purchases": 363, "purchase_rate": 2.82, "purchase_brand_count": 61, "brand_purchase_share": 16.8, "purchase_price_median": 25.99, "brand_purchase_price_median": 70.99, "purchase_same_day": 12, "purchase_1day": 132, "purchase_2day": 123, "cluster": "Motorcycle", "qoq_search_pct": 106.958, "yoy_search_pct": 60.444, "click_vs_impr": 8.03, "cart_vs_click": -1.28, "purchase_vs_cart": -0.71, "purchase_vs_impr": 6.04}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "can am x3 windshield", "score": 263, "search_volume": 6610, "impressions": 167443, "brand_impressions": 48309, "brand_impression_share": 28.85, "clicks": 2480, "ctr": 37.52, "click_brand_count": 826, "brand_click_share": 33.31, "click_price_median": 229.99, "brand_click_price_median": 299.99, "click_same_day": 0, "click_1day": 176, "click_2day": 458, "cart_adds": 299, "cart_rate": 4.52, "cart_brand_count": 92, "brand_cart_share": 30.77, "cart_price_median": 229.99, "brand_cart_price_median": 239.99, "cart_same_day": 0, "cart_1day": 18, "cart_2day": 59, "purchases": 72, "purchase_rate": 1.09, "purchase_brand_count": 24, "brand_purchase_share": 33.33, "purchase_price_median": 234.13, "brand_purchase_price_median": 479.99, "purchase_same_day": 0, "purchase_1day": 6, "purchase_2day": 16, "cluster": "UTV/SxS", "qoq_search_pct": 5.339, "yoy_search_pct": 13.73, "click_vs_impr": 4.46, "cart_vs_click": -2.54, "purchase_vs_cart": 2.56, "purchase_vs_impr": 4.48}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "polaris ranger windshield", "score": 278, "search_volume": 6170, "impressions": 210793, "brand_impressions": 49462, "brand_impression_share": 23.46, "clicks": 1595, "ctr": 25.85, "click_brand_count": 603, "brand_click_share": 37.81, "click_price_median": 189.99, "brand_click_price_median": 179.99, "click_same_day": 1, "click_1day": 109, "click_2day": 330, "cart_adds": 207, "cart_rate": 3.35, "cart_brand_count": 82, "brand_cart_share": 39.61, "cart_price_median": 179.99, "brand_cart_price_median": 169.99, "cart_same_day": 1, "cart_1day": 14, "cart_2day": 52, "purchases": 61, "purchase_rate": 0.99, "purchase_brand_count": 31, "brand_purchase_share": 50.82, "purchase_price_median": 159.99, "brand_purchase_price_median": 159.99, "purchase_same_day": 0, "purchase_1day": 3, "purchase_2day": 22, "cluster": "UTV/SxS", "qoq_search_pct": 34.16, "yoy_search_pct": 45.725, "click_vs_impr": 14.35, "cart_vs_click": 1.8, "purchase_vs_cart": 11.21, "purchase_vs_impr": 27.36}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "polaris ranger 1000 windshield", "score": 336, "search_volume": 4593, "impressions": 128409, "brand_impressions": 35496, "brand_impression_share": 27.64, "clicks": 1686, "ctr": 36.71, "click_brand_count": 587, "brand_click_share": 34.82, "click_price_median": 179.99, "brand_click_price_median": 179.99, "click_same_day": 2, "click_1day": 90, "click_2day": 307, "cart_adds": 200, "cart_rate": 4.35, "cart_brand_count": 78, "brand_cart_share": 39.0, "cart_price_median": 169.95, "brand_cart_price_median": 159.99, "cart_same_day": 0, "cart_1day": 16, "cart_2day": 38, "purchases": 68, "purchase_rate": 1.48, "purchase_brand_count": 27, "brand_purchase_share": 39.71, "purchase_price_median": 159.98, "brand_purchase_price_median": 159.99, "purchase_same_day": 0, "purchase_1day": 4, "purchase_2day": 15, "cluster": "UTV/SxS", "qoq_search_pct": 65.872, "yoy_search_pct": 36.656, "click_vs_impr": 7.18, "cart_vs_click": 4.18, "purchase_vs_cart": 0.71, "purchase_vs_impr": 12.07}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "can am defender windshield", "score": 380, "search_volume": 4304, "impressions": 156417, "brand_impressions": 41709, "brand_impression_share": 26.67, "clicks": 1182, "ctr": 27.46, "click_brand_count": 439, "brand_click_share": 37.14, "click_price_median": 199.99, "brand_click_price_median": 199.99, "click_same_day": 0, "click_1day": 96, "click_2day": 209, "cart_adds": 133, "cart_rate": 3.09, "cart_brand_count": 54, "brand_cart_share": 40.6, "cart_price_median": 189.99, "brand_cart_price_median": 189.99, "cart_same_day": 0, "cart_1day": 13, "cart_2day": 24, "purchases": 49, "purchase_rate": 1.14, "purchase_brand_count": 22, "brand_purchase_share": 44.9, "purchase_price_median": 189.99, "brand_purchase_price_median": 189.99, "purchase_same_day": 0, "purchase_1day": 7, "purchase_2day": 11, "cluster": "UTV/SxS", "qoq_search_pct": -6.9, "yoy_search_pct": -10.501, "click_vs_impr": 10.47, "cart_vs_click": 3.46, "purchase_vs_cart": 4.3, "purchase_vs_impr": 18.23}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "honda talon windshield", "score": 641, "search_volume": 3754, "impressions": 109402, "brand_impressions": 17935, "brand_impression_share": 16.39, "clicks": 1338, "ctr": 35.64, "click_brand_count": 333, "brand_click_share": 24.89, "click_price_median": 239.99, "brand_click_price_median": 299.99, "click_same_day": 0, "click_1day": 92, "click_2day": 239, "cart_adds": 191, "cart_rate": 5.09, "cart_brand_count": 51, "brand_cart_share": 26.7, "cart_price_median": 239.99, "brand_cart_price_median": 299.99, "cart_same_day": 0, "cart_1day": 16, "cart_2day": 44, "purchases": 55, "purchase_rate": 1.47, "purchase_brand_count": 20, "brand_purchase_share": 36.36, "purchase_price_median": 235.0, "brand_purchase_price_median": 179.99, "purchase_same_day": 0, "purchase_1day": 8, "purchase_2day": 14, "cluster": "UTV/SxS", "qoq_search_pct": 9.319, "yoy_search_pct": null, "click_vs_impr": 8.5, "cart_vs_click": 1.81, "purchase_vs_cart": 9.66, "purchase_vs_impr": 19.97}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "utv windshield", "score": 525, "search_volume": 3202, "impressions": 83554, "brand_impressions": 35348, "brand_impression_share": 42.31, "clicks": 982, "ctr": 30.67, "click_brand_count": 368, "brand_click_share": 37.47, "click_price_median": 165.99, "brand_click_price_median": 169.99, "click_same_day": 0, "click_1day": 74, "click_2day": 205, "cart_adds": 93, "cart_rate": 2.9, "cart_brand_count": 36, "brand_cart_share": 38.71, "cart_price_median": 169.97, "brand_cart_price_median": 169.99, "cart_same_day": 0, "cart_1day": 10, "cart_2day": 21, "purchases": 22, "purchase_rate": 0.69, "purchase_brand_count": 12, "brand_purchase_share": 54.55, "purchase_price_median": 159.99, "brand_purchase_price_median": 169.99, "purchase_same_day": 0, "purchase_1day": 6, "purchase_2day": 3, "cluster": "UTV/SxS", "qoq_search_pct": 11.607, "yoy_search_pct": -2.289, "click_vs_impr": -4.84, "cart_vs_click": 1.24, "purchase_vs_cart": 15.84, "purchase_vs_impr": 12.24}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "kawasaki mule windshield", "score": 798, "search_volume": 3163, "impressions": 95768, "brand_impressions": 17713, "brand_impression_share": 18.5, "clicks": 971, "ctr": 30.7, "click_brand_count": 356, "brand_click_share": 36.66, "click_price_median": 209.99, "brand_click_price_median": 269.99, "click_same_day": 0, "click_1day": 51, "click_2day": 159, "cart_adds": 105, "cart_rate": 3.32, "cart_brand_count": 42, "brand_cart_share": 40.0, "cart_price_median": 209.99, "brand_cart_price_median": 269.99, "cart_same_day": 0, "cart_1day": 9, "cart_2day": 19, "purchases": 22, "purchase_rate": 0.7, "purchase_brand_count": 8, "brand_purchase_share": 36.36, "purchase_price_median": 199.99, "brand_purchase_price_median": 179.99, "purchase_same_day": 0, "purchase_1day": 3, "purchase_2day": 4, "cluster": "UTV/SxS", "qoq_search_pct": -19.208, "yoy_search_pct": null, "click_vs_impr": 18.16, "cart_vs_click": 3.34, "purchase_vs_cart": -3.64, "purchase_vs_impr": 17.86}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "can am windshield", "score": 851, "search_volume": 2582, "impressions": 69493, "brand_impressions": 20680, "brand_impression_share": 29.76, "clicks": 828, "ctr": 32.07, "click_brand_count": 264, "brand_click_share": 31.88, "click_price_median": 218.49, "brand_click_price_median": 218.49, "click_same_day": 0, "click_1day": 51, "click_2day": 150, "cart_adds": 84, "cart_rate": 3.25, "cart_brand_count": 33, "brand_cart_share": 39.29, "cart_price_median": 218.49, "brand_cart_price_median": 229.99, "cart_same_day": 0, "cart_1day": 8, "cart_2day": 15, "purchases": 22, "purchase_rate": 0.85, "purchase_brand_count": 8, "brand_purchase_share": 36.36, "purchase_price_median": 214.95, "brand_purchase_price_median": 229.99, "purchase_same_day": 0, "purchase_1day": 2, "purchase_2day": 4, "cluster": "UTV/SxS", "qoq_search_pct": 15.733, "yoy_search_pct": 7.763, "click_vs_impr": 2.12, "cart_vs_click": 7.41, "purchase_vs_cart": -2.93, "purchase_vs_impr": 6.6}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "rzr windshield", "score": 745, "search_volume": 2554, "impressions": 59393, "brand_impressions": 20338, "brand_impression_share": 34.24, "clicks": 848, "ctr": 33.2, "click_brand_count": 314, "brand_click_share": 37.03, "click_price_median": 191.99, "brand_click_price_median": 151.99, "click_same_day": 0, "click_1day": 94, "click_2day": 224, "cart_adds": 120, "cart_rate": 4.7, "cart_brand_count": 39, "brand_cart_share": 32.5, "cart_price_median": 169.97, "brand_cart_price_median": 123.49, "cart_same_day": 0, "cart_1day": 21, "cart_2day": 31, "purchases": 26, "purchase_rate": 1.02, "purchase_brand_count": 12, "brand_purchase_share": 46.15, "purchase_price_median": 117.31, "brand_purchase_price_median": 99.99, "purchase_same_day": 0, "purchase_1day": 5, "purchase_2day": 6, "cluster": "UTV/SxS", "qoq_search_pct": -11.381, "yoy_search_pct": -16.781, "click_vs_impr": 2.79, "cart_vs_click": -4.53, "purchase_vs_cart": 13.65, "purchase_vs_impr": 11.91}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "can am maverick x3 windshield", "score": 729, "search_volume": 2498, "impressions": 70777, "brand_impressions": 18990, "brand_impression_share": 26.83, "clicks": 907, "ctr": 36.31, "click_brand_count": 345, "brand_click_share": 38.04, "click_price_median": 229.99, "brand_click_price_median": 299.99, "click_same_day": 0, "click_1day": 66, "click_2day": 231, "cart_adds": 110, "cart_rate": 4.4, "cart_brand_count": 47, "brand_cart_share": 42.73, "cart_price_median": 218.49, "brand_cart_price_median": 299.99, "cart_same_day": 0, "cart_1day": 13, "cart_2day": 31, "purchases": 25, "purchase_rate": 1.0, "purchase_brand_count": 10, "brand_purchase_share": 40.0, "purchase_price_median": 211.56, "brand_purchase_price_median": 218.49, "purchase_same_day": 0, "purchase_1day": 6, "purchase_2day": 7, "cluster": "UTV/SxS", "qoq_search_pct": -22.71, "yoy_search_pct": -32.668, "click_vs_impr": 11.21, "cart_vs_click": 4.69, "purchase_vs_cart": -2.73, "purchase_vs_impr": 13.17}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "2026 polaris ranger 1000 windshield", "score": 634, "search_volume": 2380, "impressions": 69673, "brand_impressions": 20573, "brand_impression_share": 29.53, "clicks": 1009, "ctr": 42.39, "click_brand_count": 365, "brand_click_share": 36.17, "click_price_median": 169.99, "brand_click_price_median": 170.19, "click_same_day": 0, "click_1day": 75, "click_2day": 142, "cart_adds": 155, "cart_rate": 6.51, "cart_brand_count": 57, "brand_cart_share": 36.77, "cart_price_median": 159.99, "brand_cart_price_median": 159.99, "cart_same_day": 0, "cart_1day": 9, "cart_2day": 20, "purchases": 42, "purchase_rate": 1.76, "purchase_brand_count": 14, "brand_purchase_share": 33.33, "purchase_price_median": 159.99, "brand_purchase_price_median": 159.99, "purchase_same_day": 0, "purchase_1day": 3, "purchase_2day": 6, "cluster": "UTV/SxS", "qoq_search_pct": null, "yoy_search_pct": null, "click_vs_impr": 6.64, "cart_vs_click": 0.6, "purchase_vs_cart": -3.44, "purchase_vs_impr": 3.8}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "kawasaki mule pro fxt windshield", "score": 897, "search_volume": 2235, "impressions": 62727, "brand_impressions": 9144, "brand_impression_share": 14.58, "clicks": 1097, "ctr": 49.08, "click_brand_count": 340, "brand_click_share": 30.99, "click_price_median": 271.99, "brand_click_price_median": 399.99, "click_same_day": 0, "click_1day": 55, "click_2day": 147, "cart_adds": 107, "cart_rate": 4.79, "cart_brand_count": 39, "brand_cart_share": 36.45, "cart_price_median": 279.99, "brand_cart_price_median": 399.99, "cart_same_day": 0, "cart_1day": 3, "cart_2day": 19, "purchases": 35, "purchase_rate": 1.57, "purchase_brand_count": 15, "brand_purchase_share": 42.86, "purchase_price_median": 289.99, "brand_purchase_price_median": 399.99, "purchase_same_day": 0, "purchase_1day": 0, "purchase_2day": 8, "cluster": "UTV/SxS", "qoq_search_pct": -0.357, "yoy_search_pct": null, "click_vs_impr": 16.41, "cart_vs_click": 5.46, "purchase_vs_cart": 6.41, "purchase_vs_impr": 28.28}, {"period": "2026Q2", "year": 2026, "quarter": 2, "term": "kemimoto windshield", "score": 773, "search_volume": 837, "impressions": 19658, "brand_impressions": 17791, "brand_impression_share": 90.5, "clicks": 281, "ctr": 33.57, "click_brand_count": 263, "brand_click_share": 93.59, "click_price_median": 239.99, "brand_click_price_median": 237.49, "click_same_day": 1, "click_1day": 30, "click_2day": 57, "cart_adds": 46, "cart_rate": 5.5, "cart_brand_count": 45, "brand_cart_share": 97.83, "cart_price_median": 214.69, "brand_cart_price_median": 214.69, "cart_same_day": 1, "cart_1day": 6, "cart_2day": 12, "purchases": 14, "purchase_rate": 1.67, "purchase_brand_count": 14, "brand_purchase_share": 100.0, "purchase_price_median": 179.98, "brand_purchase_price_median": 179.98, "purchase_same_day": 0, "purchase_1day": 1, "purchase_2day": 7, "cluster": "UTV/SxS", "qoq_search_pct": 24.368, "yoy_search_pct": 33.068, "click_vs_impr": 3.09, "cart_vs_click": 4.24, "purchase_vs_cart": 2.17, "purchase_vs_impr": 9.5}], "history": [{"term": "golf cart windshield", "2025Q1": 19530, "2025Q2": 29171, "2025Q3": 27785, "2025Q4": 28195, "2026Q1": 23319, "2026Q2": 35071}, {"term": "motorcycle windshield extension", "2025Q1": 4802, "2025Q2": 8009, "2025Q3": 7994, "2025Q4": 5258, "2026Q1": 6209, "2026Q2": 12850}, {"term": "can am x3 windshield", "2025Q1": 6935, "2025Q2": 5812, "2025Q3": 6022, "2025Q4": 6987, "2026Q1": 6275, "2026Q2": 6610}, {"term": "polaris ranger windshield", "2025Q1": 4295, "2025Q2": 4234, "2025Q3": 6060, "2025Q4": 6999, "2026Q1": 4599, "2026Q2": 6170}, {"term": "polaris ranger 1000 windshield", "2025Q1": 2667, "2025Q2": 3361, "2025Q3": 4801, "2025Q4": 4599, "2026Q1": 2769, "2026Q2": 4593}, {"term": "can am defender windshield", "2025Q1": 5202, "2025Q2": 4809, "2025Q3": 6014, "2025Q4": 6751, "2026Q1": 4623, "2026Q2": 4304}, {"term": "honda talon windshield", "2025Q1": 3711, "2025Q2": null, "2025Q3": 4150, "2025Q4": null, "2026Q1": 3434, "2026Q2": 3754}, {"term": "utv windshield", "2025Q1": 3020, "2025Q2": 3277, "2025Q3": 3911, "2025Q4": 4130, "2026Q1": 2869, "2026Q2": 3202}, {"term": "kawasaki mule windshield", "2025Q1": 3050, "2025Q2": null, "2025Q3": null, "2025Q4": 5753, "2026Q1": 3915, "2026Q2": 3163}, {"term": "can am windshield", "2025Q1": 2408, "2025Q2": 2396, "2025Q3": 2635, "2025Q4": 2813, "2026Q1": 2231, "2026Q2": 2582}, {"term": "rzr windshield", "2025Q1": 2817, "2025Q2": 3069, "2025Q3": 3475, "2025Q4": 3641, "2026Q1": 2882, "2026Q2": 2554}, {"term": "can am maverick x3 windshield", "2025Q1": 2627, "2025Q2": 3710, "2025Q3": 4162, "2025Q4": 3499, "2026Q1": 3232, "2026Q2": 2498}, {"term": "2026 polaris ranger 1000 windshield", "2025Q1": null, "2025Q2": null, "2025Q3": null, "2025Q4": null, "2026Q1": null, "2026Q2": 2380}, {"term": "kawasaki mule pro fxt windshield", "2025Q1": null, "2025Q2": null, "2025Q3": null, "2025Q4": null, "2026Q1": 2243, "2026Q2": 2235}, {"term": "kemimoto windshield", "2025Q1": 384, "2025Q2": 629, "2025Q3": 651, "2025Q4": 876, "2026Q1": 673, "2026Q2": 837}], "funnel": [{"term": "golf cart windshield", "search_volume": 35071, "shares": [8.27, 10.51, 9.29, 8.53], "deltas": [2.24, -1.22, -0.76, 0.26]}, {"term": "motorcycle windshield extension", "search_volume": 12850, "shares": [10.76, 18.79, 17.51, 16.8], "deltas": [8.03, -1.28, -0.71, 6.04]}, {"term": "can am x3 windshield", "search_volume": 6610, "shares": [28.85, 33.31, 30.77, 33.33], "deltas": [4.46, -2.54, 2.56, 4.48]}, {"term": "polaris ranger windshield", "search_volume": 6170, "shares": [23.46, 37.81, 39.61, 50.82], "deltas": [14.35, 1.8, 11.21, 27.36]}, {"term": "polaris ranger 1000 windshield", "search_volume": 4593, "shares": [27.64, 34.82, 39.0, 39.71], "deltas": [7.18, 4.18, 0.71, 12.07]}, {"term": "can am defender windshield", "search_volume": 4304, "shares": [26.67, 37.14, 40.6, 44.9], "deltas": [10.47, 3.46, 4.3, 18.23]}, {"term": "honda talon windshield", "search_volume": 3754, "shares": [16.39, 24.89, 26.7, 36.36], "deltas": [8.5, 1.81, 9.66, 19.97]}, {"term": "utv windshield", "search_volume": 3202, "shares": [42.31, 37.47, 38.71, 54.55], "deltas": [-4.84, 1.24, 15.84, 12.24]}, {"term": "kawasaki mule windshield", "search_volume": 3163, "shares": [18.5, 36.66, 40.0, 36.36], "deltas": [18.16, 3.34, -3.64, 17.86]}, {"term": "can am windshield", "search_volume": 2582, "shares": [29.76, 31.88, 39.29, 36.36], "deltas": [2.12, 7.41, -2.93, 6.6]}, {"term": "rzr windshield", "search_volume": 2554, "shares": [34.24, 37.03, 32.5, 46.15], "deltas": [2.79, -4.53, 13.65, 11.91]}, {"term": "can am maverick x3 windshield", "search_volume": 2498, "shares": [26.83, 38.04, 42.73, 40.0], "deltas": [11.21, 4.69, -2.73, 13.17]}, {"term": "2026 polaris ranger 1000 windshield", "search_volume": 2380, "shares": [29.53, 36.17, 36.77, 33.33], "deltas": [6.64, 0.6, -3.44, 3.8]}, {"term": "kawasaki mule pro fxt windshield", "search_volume": 2235, "shares": [14.58, 30.99, 36.45, 42.86], "deltas": [16.41, 5.46, 6.41, 28.28]}, {"term": "kemimoto windshield", "search_volume": 837, "shares": [90.5, 93.59, 97.83, 100.0], "deltas": [3.09, 4.24, 2.17, 9.5]}], "clusterCurrent": [{"cluster": "Golf Cart", "terms": 1, "search_volume": 35071, "purchases": 516, "avg_brand_impr": 8.27, "avg_brand_purchase": 8.53, "search_share_pct": 37.791, "purchase_share_pct": 37.069}, {"cluster": "Motorcycle", "terms": 1, "search_volume": 12850, "purchases": 363, "avg_brand_impr": 10.76, "avg_brand_purchase": 16.8, "search_share_pct": 13.847, "purchase_share_pct": 26.078}, {"cluster": "UTV/SxS", "terms": 13, "search_volume": 44882, "purchases": 513, "avg_brand_impr": 31.482, "avg_brand_purchase": 45.748, "search_share_pct": 48.363, "purchase_share_pct": 36.853}], "segments": [{"market": "motorcycle windshield", "search360": 218150, "growth180": 31.11, "search90": 62016, "growth90": 0.43, "salesLow": 1250, "salesHigh": 1500, "salesMid": 1375.0, "topClickedItems": 102, "avgPrice": 62.46, "minPrice": 17.02, "maxPrice": 181.16, "returnRate": 5.3, "salesPer90Search": 2.22}, {"market": "golf cart windshield", "search360": 235073, "growth180": 16.36, "search90": 65330, "growth90": 6.93, "salesLow": 5000, "salesHigh": 6000, "salesMid": 5500.0, "topClickedItems": 44, "avgPrice": 95.13, "minPrice": 23.35, "maxPrice": 119.99, "returnRate": 4.74, "salesPer90Search": 8.42}, {"market": "motorcycle windshield extension", "search360": 43359, "growth180": 66.52, "search90": 14768, "growth90": 19.84, "salesLow": 1000, "salesHigh": 1250, "salesMid": 1125.0, "topClickedItems": 28, "avgPrice": 30.97, "minPrice": 16.3, "maxPrice": 76.93, "returnRate": 6.3, "salesPer90Search": 7.62}, {"market": "rzr windshield", "search360": 23631, "growth180": -21.27, "search90": 4643, "growth90": -19.5, "salesLow": 100, "salesHigh": 250, "salesMid": 175.0, "topClickedItems": 32, "avgPrice": 207.41, "minPrice": 75.45, "maxPrice": 385.73, "returnRate": 4.82, "salesPer90Search": 3.77}, {"market": "road glide windshield", "search360": 117087, "growth180": 42.86, "search90": 31559, "growth90": -15.44, "salesLow": 750, "salesHigh": 1000, "salesMid": 875.0, "topClickedItems": 64, "avgPrice": 133.82, "minPrice": 25.66, "maxPrice": 269.43, "returnRate": 5.6, "salesPer90Search": 2.77}, {"market": "street glide windshield", "search360": 86870, "growth180": 31.69, "search90": 24303, "growth90": -3.08, "salesLow": 750, "salesHigh": 1000, "salesMid": 875.0, "topClickedItems": 49, "avgPrice": 49.75, "minPrice": 24.92, "maxPrice": 138.02, "returnRate": 5.14, "salesPer90Search": 3.6}, {"market": "polaris ranger windshield", "search360": 101630, "growth180": -16.51, "search90": 24471, "growth90": 12.38, "salesLow": 1250, "salesHigh": 1500, "salesMid": 1375.0, "topClickedItems": 31, "avgPrice": 257.4, "minPrice": 100.04, "maxPrice": 689.19, "returnRate": 2.65, "salesPer90Search": 5.62}, {"market": "kawasaki mule windshield", "search360": 25833, "growth180": -37.12, "search90": 5111, "growth90": 5.12, "salesLow": 250, "salesHigh": 500, "salesMid": 375.0, "topClickedItems": 30, "avgPrice": 220.28, "minPrice": 45.89, "maxPrice": 473.45, "returnRate": 2.88, "salesPer90Search": 7.34}, {"market": "yamaha golf cart windshield", "search360": 34182, "growth180": 27.44, "search90": 9979, "growth90": 8.77, "salesLow": 1000, "salesHigh": 1250, "salesMid": 1125.0, "topClickedItems": 41, "avgPrice": 108.54, "minPrice": 79.7, "maxPrice": 168.4, "returnRate": 4.58, "salesPer90Search": 11.27}, {"market": "club car precedent windshield", "search360": 85043, "growth180": 12.1, "search90": 23199, "growth90": 6.66, "salesLow": 3000, "salesHigh": 4000, "salesMid": 3500.0, "topClickedItems": 24, "avgPrice": 98.47, "minPrice": 67.64, "maxPrice": 117.76, "returnRate": 4.55, "salesPer90Search": 15.09}, {"market": "can am x3 windshield", "search360": 71939, "growth180": -8.64, "search90": 15588, "growth90": -16.91, "salesLow": 500, "salesHigh": 750, "salesMid": 625.0, "topClickedItems": 19, "avgPrice": 298.58, "minPrice": 135.47, "maxPrice": 801.75, "returnRate": 3.92, "salesPer90Search": 4.01}, {"market": "polaris ranger 570 windshield", "search360": 31139, "growth180": 3.6, "search90": 7402, "growth90": -12.33, "salesLow": 250, "salesHigh": 500, "salesMid": 375.0, "topClickedItems": 42, "avgPrice": 212.51, "minPrice": 85.66, "maxPrice": 499.23, "returnRate": 6.31, "salesPer90Search": 5.07}, {"market": "honda pioneer 1000 windshield", "search360": 16267, "growth180": -43.56, "search90": 2655, "growth90": -17.4, "salesLow": 250, "salesHigh": 500, "salesMid": 375.0, "topClickedItems": 21, "avgPrice": 259.75, "minPrice": 149.61, "maxPrice": 557.67, "returnRate": 1.66, "salesPer90Search": 14.12}, {"market": "club car windshield", "search360": 24758, "growth180": 16.32, "search90": 6478, "growth90": -5.23, "salesLow": 1000, "salesHigh": 1250, "salesMid": 1125.0, "topClickedItems": 35, "avgPrice": 100.06, "minPrice": 26.48, "maxPrice": 120.49, "returnRate": 4.17, "salesPer90Search": 17.37}], "opportunities": [{"title": "polaris ranger windshield", "reason": "细分市场90天搜索增长 12.38%，ABA品牌购买份额高于曝光 27.36pct。", "action": "加大主图/广告曝光，优先承接高转化型号词。"}, {"title": "kawasaki mule windshield", "reason": "细分市场90天搜索增长 5.12%，ABA品牌购买份额高于曝光 17.86pct。", "action": "加大主图/广告曝光，优先承接高转化型号词。"}, {"title": "golf cart windshield", "reason": "品牌曝光份额 8.27%，购买份额 8.53%，购买较曝光高 0.26pct。", "type": "补曝光机会"}, {"title": "polaris ranger windshield", "reason": "搜索量 6,170，环比 34.16%，同比 45.73%；品牌购买份额较曝光高 27.36pct。", "type": "需求增长 + 品牌转化优势"}, {"title": "kemimoto windshield", "reason": "搜索量 837，环比 24.37%，同比 33.07%；品牌购买份额较曝光高 9.5pct。", "type": "需求增长 + 品牌转化优势"}, {"title": "polaris ranger 1000 windshield", "reason": "搜索量 4,593，环比 65.87%，同比 36.66%；品牌购买份额较曝光高 12.07pct。", "type": "需求增长 + 品牌转化优势"}, {"title": "motorcycle windshield extension", "reason": "搜索量 12,850，环比 106.96%，同比 60.44%；品牌购买份额较曝光高 6.04pct。", "type": "需求增长 + 品牌转化优势"}, {"title": "golf cart windshield", "reason": "90天搜索 65,330，90天增长 6.93%，180天增长 16.36%，均价 $95.13。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "motorcycle windshield", "reason": "90天搜索 62,016，90天增长 0.43%，180天增长 31.11%，均价 $62.46。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "road glide windshield", "reason": "90天搜索 31,559，90天增长 -15.44%，180天增长 42.86%，均价 $133.82。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "polaris ranger windshield", "reason": "90天搜索 24,471，90天增长 12.38%，180天增长 -16.51%，均价 $257.4。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "street glide windshield", "reason": "90天搜索 24,303，90天增长 -3.08%，180天增长 31.69%，均价 $49.75。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "club car precedent windshield", "reason": "90天搜索 23,199，90天增长 6.66%，180天增长 12.1%，均价 $98.47。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "motorcycle windshield extension", "reason": "90天搜索 14,768，90天增长 19.84%，180天增长 66.52%，均价 $30.97。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "yamaha golf cart windshield", "reason": "90天搜索 9,979，90天增长 8.77%，180天增长 27.44%，均价 $108.54。", "action": "评估SKU覆盖、价格带与广告词包。"}, {"title": "kawasaki mule windshield", "reason": "90天搜索 5,111，90天增长 5.12%，180天增长 -37.12%，均价 $220.28。", "action": "评估SKU覆盖、价格带与广告词包。"}], "risks": [{"title": "motorcycle windshield extension", "reason": "细分市场退货率 6.3%，高于多数市场，需关注适配与安装说明。", "action": "强化车型适配表、安装视频和售前确认。"}, {"title": "can am x3 windshield", "reason": "细分市场90天搜索增长 -16.91%，ABA当期搜索 6,610。", "action": "控制补货节奏，将预算转向增长子市场。"}, {"title": "rzr windshield", "reason": "细分市场90天搜索增长 -19.5%，ABA当期搜索 2,554。", "action": "控制补货节奏，将预算转向增长子市场。"}, {"title": "kawasaki mule windshield", "reason": "搜索量环比 -19.21%，需谨慎扩库存/预算。", "type": "短期需求回落"}, {"title": "can am maverick x3 windshield", "reason": "搜索量环比 -22.71%，需谨慎扩库存/预算。", "type": "短期需求回落"}, {"title": "can am maverick x3 windshield", "reason": "搜索量同比 -32.67%，说明同季需求或排名覆盖下滑。", "type": "同比下滑"}, {"title": "rzr windshield", "reason": "搜索量环比 -11.38%，需谨慎扩库存/预算。", "type": "短期需求回落"}, {"title": "rzr windshield", "reason": "搜索量同比 -16.78%，说明同季需求或排名覆盖下滑。", "type": "同比下滑"}, {"title": "motorcycle windshield extension", "reason": "90天增长 19.84%，退货率 6.3%。", "action": "缩小投放或加强适配说明。"}, {"title": "rzr windshield", "reason": "90天增长 -19.5%，退货率 4.82%。", "action": "缩小投放或加强适配说明。"}, {"title": "road glide windshield", "reason": "90天增长 -15.44%，退货率 5.6%。", "action": "缩小投放或加强适配说明。"}, {"title": "can am x3 windshield", "reason": "90天增长 -16.91%，退货率 3.92%。", "action": "缩小投放或加强适配说明。"}, {"title": "polaris ranger 570 windshield", "reason": "90天增长 -12.33%，退货率 6.31%。", "action": "缩小投放或加强适配说明。"}, {"title": "honda pioneer 1000 windshield", "reason": "90天增长 -17.4%，退货率 1.66%。", "action": "缩小投放或加强适配说明。"}]}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('dataset').textContent);
+const fmt = n => (n===null||n===undefined||Number.isNaN(n)) ? '—' : Number(n).toLocaleString('en-US');
+const pct = n => (n===null||n===undefined||Number.isNaN(n)) ? '—' : `${Number(n).toFixed(2)}%`;
+const money = n => (n===null||n===undefined||Number.isNaN(n)) ? '—' : `$${Number(n).toFixed(2)}`;
+const clsDelta = n => n==null ? 'flat' : n>=0 ? 'up' : 'down';
+const signedPct = n => (n===null||n===undefined||Number.isNaN(n)) ? '—' : `${n>=0?'+':''}${Number(n).toFixed(2)}%`;
+const colors = ['#2454d6','#02a88a','#e58a00','#8057d5','#2aa7ff','#d64242'];
+
+function setText(id, txt){ const el = document.getElementById(id); if(el) el.textContent = txt; }
+setText('heroSearch', fmt(DATA.overallStats.latestSearch));
+setText('heroGrowth', `${signedPct(DATA.overallStats.qoqSearch)} / ${signedPct(DATA.overallStats.yoySearch)}`);
+setText('heroPurchase', fmt(DATA.overallStats.latestPurchases));
+setText('kpiSearch', fmt(DATA.overallStats.latestSearch));
+setText('kpiSearchDelta', `环比 ${signedPct(DATA.overallStats.qoqSearch)}｜同比 ${signedPct(DATA.overallStats.yoySearch)}`);
+setText('kpiPurchases', fmt(DATA.overallStats.latestPurchases));
+setText('kpiPurchDelta', `搜索→购买率 ${pct(DATA.overallStats.latestPurchaseRate)}`);
+setText('kpiCartRate', pct(DATA.overallStats.latestCartRate));
+setText('kpiC2P', pct(DATA.overallStats.latestClickToPurchase));
+
+function lineChart(el, series, opts={}){
+  const W=820,H=330,m={l:58,r:28,t:24,b:42};
+  const xs=DATA.periods;
+  const all=series.flatMap(s=>s.values).filter(v=>v!=null);
+  const max=Math.max(...all)*1.1, min=0;
+  const x=i=>m.l + i*(W-m.l-m.r)/(xs.length-1);
+  const y=v=>H-m.b-(v-min)/(max-min)*(H-m.t-m.b);
+  const grid=[0,.25,.5,.75,1].map(t=>min+t*(max-min));
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opts.label||'line chart'}">`;
+  grid.forEach(g=>{svg+=`<line class="gridline" x1="${m.l}" x2="${W-m.r}" y1="${y(g)}" y2="${y(g)}"/><text x="${m.l-10}" y="${y(g)+4}" text-anchor="end" fill="#475569" font-size="12">${fmt(Math.round(g))}</text>`});
+  xs.forEach((d,i)=>svg+=`<text x="${x(i)}" y="${H-14}" text-anchor="middle" fill="#475569" font-size="12">${d}</text>`);
+  series.forEach((s,si)=>{
+    const pts=s.values.map((v,i)=>v==null?null:[x(i),y(v)]).filter(Boolean);
+    if(pts.length){svg+=`<polyline class="line" stroke="${s.color||colors[si]}" points="${pts.map(p=>p.join(',')).join(' ')}"/>`;}
+    pts.forEach((p,i)=>{svg+=`<circle class="dot" cx="${p[0]}" cy="${p[1]}" r="5" fill="${s.color||colors[si]}"/>`});
+  });
+  svg+='</svg>'; el.innerHTML=svg;
+}
+lineChart(document.getElementById('trendChart'), [
+  {name:'搜索查询量', color:'#2454d6', values:DATA.overview.map(d=>d.search_volume)},
+  {name:'购买次数', color:'#02a88a', values:DATA.overview.map(d=>d.purchases*55)}
+], {label:'季度搜索与购买趋势'});
+
+const s = DATA.overallStats;
+document.getElementById('seasonText').innerHTML = `
+  <p>从6个季度看，搜索需求在 <b>${s.peakPeriod}</b> 达到峰值（${fmt(s.peakSearch)}），<b>${s.troughPeriod}</b> 为低点（${fmt(s.troughSearch)}）。</p>
+  <p>2026Q2搜索查询量为 <b>${fmt(s.latestSearch)}</b>，环比 <b class="${clsDelta(s.qoqSearch)}">${signedPct(s.qoqSearch)}</b>，同比 <b class="${clsDelta(s.yoySearch)}">${signedPct(s.yoySearch)}</b>，说明当前需求较Q1修复，但仍未回到2025Q4高峰。</p>
+  <p class="note">淡旺季建议：Q4可视作高峰备货和投放窗口；Q1回落后，Q2开始恢复。预算节奏应在Q2提前测试增长词，Q4集中放量。</p>`;
+
+function spark(values){
+  const W=130,H=34, vals=values.map(v=>v==null?null:Number(v)); const nums=vals.filter(v=>v!=null); if(nums.length<2) return '<span class="muted">数据不足</span>';
+  const max=Math.max(...nums), min=Math.min(...nums), pad=4; const step=(W-2*pad)/(vals.length-1);
+  const pts=vals.map((v,i)=>v==null?null:[pad+i*step, H-pad-(v-min)/(max-min||1)*(H-2*pad)]).filter(Boolean);
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}"><polyline fill="none" stroke="#2454d6" stroke-width="2.5" points="${pts.map(p=>p.join(',')).join(' ')}"/><circle cx="${pts[pts.length-1][0]}" cy="${pts[pts.length-1][1]}" r="3" fill="#02a88a"/></svg>`;
+}
+function renderKeywordTable(){
+  const q=document.getElementById('kwSearch').value.trim().toLowerCase();
+  const tbody=document.querySelector('#kwTable tbody');
+  const histMap=Object.fromEntries(DATA.history.map(h=>[h.term,h]));
+  const allRows = DATA.currentTerms.filter(r=>r.term.toLowerCase() !== 'windshield');
+  const rows = [...allRows]
+    .filter(r=>!q || r.term.toLowerCase().includes(q))
+    .sort((a,b)=>b.search_volume-a.search_volume);
+  const countEl=document.getElementById('kwCount');
+  if(countEl) countEl.textContent = q ? `当前显示 ${rows.length} / ${allRows.length} 个关键词` : `共 ${allRows.length} 个2026Q2关键词，已剔除品类大词 windshield`;
+  tbody.innerHTML = rows.map(r=>{
+    const h=histMap[r.term]; const vals=DATA.periods.map(p=>h[p]);
+    return `<tr><td><b>${r.term}</b><br><span class="muted">${r.cluster}</span></td><td class="num">${fmt(r.search_volume)}</td><td class="num ${clsDelta(r.qoq_search_pct)}">${signedPct(r.qoq_search_pct)}</td><td class="num ${clsDelta(r.yoy_search_pct)}">${signedPct(r.yoy_search_pct)}</td><td>${spark(vals)}</td><td class="num">${fmt(r.clicks)}</td><td class="num">${fmt(r.cart_adds)}</td><td class="num">${fmt(r.purchases)}</td><td class="num">${pct(r.purchase_rate)}</td></tr>`
+  }).join('') || '<tr><td colspan="9" class="muted">未找到匹配关键词，请换一个词搜索。</td></tr>';
+}
+document.getElementById('kwSearch').addEventListener('input', renderKeywordTable); renderKeywordTable();
+// kwTableScrollReset: 首次进入搜索趋势页时，确保从第一行开始显示
+const kwWrap=document.querySelector('#kwTable')?.closest('.table-wrap'); if(kwWrap) kwWrap.scrollTop=0;
+
+function barChart(el, labels, values, opts={}){
+  const W=650,H=320,m={l:160,r:30,t:20,b:36}; const max=Math.max(...values)*1.12;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opts.label||'bar chart'}">`;
+  labels.forEach((lab,i)=>{const y=m.t+i*(H-m.t-m.b)/labels.length+6; const bh=(H-m.t-m.b)/labels.length-10; const w=values[i]/max*(W-m.l-m.r); svg+=`<text x="${m.l-8}" y="${y+bh/2+4}" text-anchor="end" fill="#41516a" font-size="12" font-weight="700">${lab}</text><rect x="${m.l}" y="${y}" width="${w}" height="${bh}" rx="8" fill="${colors[i%colors.length]}" opacity=".88"/><text x="${m.l+w+8}" y="${y+bh/2+4}" fill="#41516a" font-size="12">${fmt(Math.round(values[i]))}</text>`});
+  svg+='</svg>'; el.innerHTML=svg;
+}
+function abaTermForFunnel(f){
+  return DATA.currentTerms.find(r=>r.term===f.term) || null;
+}
+function marketForTerm(term){
+  const exact = DATA.segments.find(s=>s.market===term);
+  if (exact) return exact;
+  const t=term.toLowerCase();
+  if(t.includes('golf cart')) return DATA.segments.find(s=>s.market==='golf cart windshield');
+  if(t.includes('polaris ranger')) return DATA.segments.find(s=>s.market==='polaris ranger windshield');
+  if(t.includes('kawasaki mule')) return DATA.segments.find(s=>s.market==='kawasaki mule windshield');
+  if(t.includes('can am x3') || t.includes('maverick x3')) return DATA.segments.find(s=>s.market==='can am x3 windshield');
+  if(t.includes('rzr')) return DATA.segments.find(s=>s.market==='rzr windshield');
+  if(t.includes('honda pioneer')) return DATA.segments.find(s=>s.market==='honda pioneer 1000 windshield');
+  if(t.includes('motorcycle')) return DATA.segments.find(s=>s.market==='motorcycle windshield extension') || DATA.segments.find(s=>s.market==='motorcycle windshield');
+  return null;
+}
+function diagnoseFunnel(f){
+  const [impr, click, cart, buy] = f.shares;
+  const [dClick, dCart, dBuy, dTotal] = f.deltas;
+  const aba = abaTermForFunnel(f);
+  const qoq = aba?.qoq_search_pct, yoy = aba?.yoy_search_pct;
+  const demandPositive = (qoq!==null && qoq!==undefined && qoq>=10) || (yoy!==null && yoy!==undefined && yoy>=10);
+  const demandWeak = (qoq!==null && qoq!==undefined && qoq<=-10) || (yoy!==null && yoy!==undefined && yoy<=-10);
+  const drops = [
+    {stage:'点击', label:'点击不足', value:dClick, action:'曝光能拿到，但点击份额低于曝光份额，优先优化搜索结果页吸引力：主图、标题关键词、价格可见性、评分评论。'},
+    {stage:'加购', label:'加购不足', value:dCart, action:'点击后加购份额下滑，优先检查价格竞争力、优惠券、卖点表达、变体选择和车型适配信息。'},
+    {stage:'购买', label:'购买不足', value:dBuy, action:'加购到购买份额下滑，优先优化配送时效、库存稳定、最终优惠、退货顾虑和详情页信任。'}
+  ];
+  const worstDrop = drops.reduce((a,b)=> b.value < a.value ? b : a, drops[0]);
+  let weak = [], strong = [], focus = '', action = '', reason = '';
+
+  // 1) 优先判断“曝光不足”：购买份额明显高于曝光份额，说明后端能承接，主要缺前端曝光覆盖。
+  if (impr < 25 && buy >= impr + 8) {
+    weak.push('曝光');
+    strong.push('点击','加购','购买');
+    focus = '曝光不足';
+    action = demandWeak ? '后端承接强，但ABA需求环比/同比偏弱；先补精准曝光和自然排名，谨慎大幅放量。' : '后端承接强但曝光份额偏低，优先补广告曝光、自然排名和核心词覆盖。';
+    const tail = worstDrop.value <= -3 ? `虽有${worstDrop.stage}小幅掉点 ${worstDrop.value.toFixed(2)}pct，但购买份额仍明显高于曝光。` : '后端份额整体能承接。';
+    reason = `曝光 ${impr.toFixed(2)}%，购买 ${buy.toFixed(2)}%，购买高于曝光 ${(buy-impr).toFixed(2)}pct；${tail}`;
+  }
+  // 2) 再判断“相邻环节最大掉点”：购买没有明显强于曝光时，最大掉点才作为主要短板。
+  else if (worstDrop.value <= -3) {
+    weak.push(worstDrop.stage);
+    focus = worstDrop.label;
+    action = worstDrop.action;
+    reason = `${worstDrop.stage}环节相对上一环节下降 ${worstDrop.value.toFixed(2)}pct，是当前最大掉点。`;
+  }
+  // 3) 没有短板且ABA需求增长，同时购买份额不低于曝光份额，属于前端曝光/搜索流量可放大。
+  else if (demandPositive && buy >= impr - 3) {
+    strong.push('曝光可放大');
+    focus = '曝光可放大';
+    action = '放大的是前端曝光/搜索流量：增加预算、拓展关键词覆盖、提升自然排名和重点SKU展示；点击、加购、购买环节以维持效率为主。';
+    reason = 'ABA需求增长，且品牌从曝光到购买的份额链路没有明显下滑，说明后段能承接新增流量。';
+  }
+  // 4) 其他情况归为稳定/观察，不直接判定为机会或短板。
+  else {
+    strong.push('链路稳定');
+    focus = '相对平稳';
+    action = demandWeak ? '品牌链路无明显短板，但ABA需求偏弱，建议维持效率、控制预算和库存节奏。' : '品牌链路无明显短板，建议维持投放并持续观察ABA环比/同比变化。';
+    reason = '相邻环节未出现超过3pct的主要掉点。';
+  }
+  const marketText = aba ? `ABA搜索量表现：当期搜索量 ${fmt(aba.search_volume)}，环比 ${signedPct(aba.qoq_search_pct)}，同比 ${signedPct(aba.yoy_search_pct)}。` : '暂无该词ABA环比/同比数据。';
+  return {weak, strong, focus, action, aba, marketText, reason, worstDrop, demandPositive, demandWeak};
+}
+function stageClass(f, idx){
+  const d=diagnoseFunnel(f); const labs=['曝光','点击','加购','购买'];
+  if(d.weak.includes(labs[idx])) return 'weak';
+  if(d.focus==='曝光可放大' && idx===0) return 'strong';
+  if(idx>0 && f.shares[idx] >= f.shares[idx-1]+5) return 'strong';
+  return '';
+}
+function renderBrandPanorama(){
+  document.getElementById('brandPanorama').innerHTML = DATA.funnel.map(f=>{
+    const d=diagnoseFunnel(f); const labs=['曝光','点击','加购','购买'];
+    return `<div class="panorama-row"><div><div class="funnel-name">${f.term}</div><span class="muted">搜索量 ${fmt(f.search_volume)}｜ABA环比 ${signedPct(d.aba?.qoq_search_pct)}｜同比 ${signedPct(d.aba?.yoy_search_pct)}</span></div><div class="stage-grid">${labs.map((l,i)=>`<div class="stage-cell ${stageClass(f,i)}"><b>${l}份额</b><span>${pct(f.shares[i])}</span></div>`).join('')}</div><div><span class="pill ${d.focus.includes('不足')?'danger':d.focus.includes('可放大')?'good':'warn'}">${d.focus}</span></div></div>`;
+  }).join('');
+}
+function renderFunnelSelect(){
+  const sel=document.getElementById('funnelSelect');
+  sel.innerHTML=DATA.funnel.map((f,i)=>`<option value="${i}">${f.term}</option>`).join('');
+  sel.onchange=()=>renderFunnelDetail(Number(sel.value)); renderFunnelDetail(0);
+}
+function renderFunnelDetail(i){
+  const f=DATA.funnel[i]; const labs=['曝光','点击','加购','购买']; const d=diagnoseFunnel(f);
+  document.getElementById('funnelDetail').innerHTML = `<p><b>${f.term}</b>｜搜索量 ${fmt(f.search_volume)}</p>` + labs.map((lab,idx)=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;font-weight:800"><span>${lab}份额</span><span>${pct(f.shares[idx])}</span></div><div class="metric-line"><span style="width:${Math.min(100,f.shares[idx])}%;background:${colors[idx]}"></span></div></div>`).join('') + `<p class="note"><b>诊断：${d.focus}</b><br>${d.marketText}<br>原因：${d.reason}<br>建议：${d.action}</p>`;
+  renderStageDiagnosis(i);
+}
+function renderStageDiagnosis(selectedIndex=0){
+  const selected = DATA.funnel[selectedIndex];
+  const selectedDiag = diagnoseFunnel(selected);
+  const buckets = {曝光:[], 点击:[], 加购:[], 购买:[], 可放大:[]};
+  DATA.funnel.forEach(f=>{ const d=diagnoseFunnel(f); if(d.focus.includes('可放大')||d.focus==='相对平稳') buckets['可放大'].push(f); else buckets[d.focus.replace('不足','')].push(f); });
+  const cards = [
+    ['曝光不足', buckets['曝光'], '购买份额明显高于曝光份额，说明后端能承接，主要缺前端曝光覆盖。'],
+    ['点击不足', buckets['点击'], '点击份额相对曝光份额下降超过3pct，且是最大掉点，说明搜索结果页吸引力不足。'],
+    ['加购不足', buckets['加购'], '加购份额相对点击份额下降超过3pct，且是最大掉点，说明价格、卖点、适配或优惠承接不足。'],
+    ['购买不足', buckets['购买'], '购买份额相对加购份额下降超过3pct，且是最大掉点，说明配送、库存、信任或最终成交条件不足。'],
+    ['曝光可放大/稳定', buckets['可放大'], '无明显环节掉点；若ABA环比/同比增长且购买份额不低于曝光，说明点击、加购、购买可以承接新增流量，可放大的是前端曝光/搜索流量；否则保持稳定观察。']
+  ];
+  document.getElementById('stageDiagnosis').innerHTML = `<div class="diagnosis ${selectedDiag.focus.includes('不足')?'risk':'good'}" style="grid-column:1/-1"><h4>当前选择：${selected.term}</h4><p>${selectedDiag.marketText}<br>品牌环节判断：<b>${selectedDiag.focus}</b>。原因：${selectedDiag.reason} 建议：${selectedDiag.action}</p><span class="tag">${selectedDiag.focus}</span></div>` + cards.map(([title,arr,desc])=>`<div class="diagnosis ${title.includes('不足')?'risk':'good'}"><h4>${title}（${arr.length}）</h4><p>${desc}</p><small class="muted">${arr.slice(0,4).map(x=>x.term).join('、') || '暂无'}</small><br><span class="tag">${title}</span></div>`).join('');
+}
+renderBrandPanorama();
+renderFunnelSelect();
+
+function bubbleChart(el){
+  const data=DATA.segments; const W=760,H=360,m={l:62,r:32,t:24,b:58};
+  const xs=data.map(d=>d.search90), ys=data.map(d=>d.growth90); const maxX=Math.max(...xs)*1.12, minY=Math.min(...ys)-5, maxY=Math.max(...ys)+5;
+  const x=v=>m.l+v/maxX*(W-m.l-m.r); const y=v=>H-m.b-(v-minY)/(maxY-minY)*(H-m.t-m.b);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="segment bubble chart">`;
+  [0,.25,.5,.75,1].forEach(t=>{const xx=m.l+t*(W-m.l-m.r); svg+=`<line class="gridline" x1="${xx}" x2="${xx}" y1="${m.t}" y2="${H-m.b}"/><text x="${xx}" y="${H-25}" text-anchor="middle" fill="#475569" font-size="12">${fmt(Math.round(t*maxX))}</text>`});
+  [minY,0,maxY].forEach(v=>{svg+=`<line class="gridline" x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end" fill="#475569" font-size="12">${v.toFixed(0)}%</text>`});
+  data.forEach((d,i)=>{const r=Math.max(5,Math.min(18,Math.sqrt(d.search360)/35)); const good=d.growth90>=5; svg+=`<circle cx="${x(d.search90)}" cy="${y(d.growth90)}" r="${r}" fill="${good?'#02a88a':'#d64242'}" opacity=".72"><title>${d.market}\n90天搜索 ${fmt(d.search90)}\n增长 ${pct(d.growth90)}</title></circle>`; if(i<8) svg+=`<text x="${x(d.search90)+r+4}" y="${y(d.growth90)+4}" fill="#344155" font-size="11" font-weight="700">${d.market.replace(' windshield','')}</text>`});
+  svg+=`<text x="${W/2}" y="${H-4}" text-anchor="middle" fill="#475569" font-size="12">90天搜索量</text><text x="14" y="${H/2}" transform="rotate(-90,14,${H/2})" text-anchor="middle" fill="#475569" font-size="12">90天搜索增长</text></svg>`;
+  el.innerHTML=svg;
+}
+bubbleChart(document.getElementById('segmentBubble'));
+barChart(document.getElementById('clusterChart'), DATA.clusterCurrent.map(d=>d.cluster), DATA.clusterCurrent.map(d=>d.search_volume), {label:'cluster current'});
+
+function renderSegmentSummary(){
+  const segs = [...DATA.segments];
+  const total90 = segs.reduce((s,d)=>s+d.search90,0);
+  const top3 = [...segs].sort((a,b)=>b.search90-a.search90).slice(0,3);
+  const growFast = [...segs].filter(d=>d.growth90>5).sort((a,b)=>b.growth90-a.growth90).slice(0,4);
+  const decline = [...segs].filter(d=>d.growth90<0).sort((a,b)=>a.growth90-b.growth90).slice(0,4);
+  const efficient = [...segs].sort((a,b)=>b.salesPer90Search-a.salesPer90Search).slice(0,4);
+  const highReturn = [...segs].filter(d=>d.returnRate>=5.5).sort((a,b)=>b.returnRate-a.returnRate).slice(0,4);
+  const highValue = [...segs].filter(d=>d.avgPrice>=200).sort((a,b)=>b.search90-a.search90).slice(0,4);
+  const names = arr => arr.map(d=>d.market).join('\u3001') || '\u6682\u65e0';
+  const cards = [
+    {cls:'good', title:'\u5e02\u573a\u5bb9\u91cf\u96c6\u4e2d', tag:'\u5bb9\u91cf\u4f18\u5148', text:`90\u5929\u641c\u7d22\u603b\u91cf ${fmt(total90)}\uff0cTop3\u4e3a ${names(top3)}\uff0c\u5408\u8ba1\u5360\u6bd4 ${pct(top3.reduce((s,d)=>s+d.search90,0)/total90*100)}\u3002\u8bf4\u660e\u6d41\u91cf\u4ecd\u96c6\u4e2d\u5728 Golf Cart\u3001Motorcycle \u548c\u90e8\u5206UTV\u578b\u53f7\u8bcd\u3002`},
+    {cls:'good', title:'\u77ed\u671f\u589e\u957f\u5e02\u573a', tag:'\u53ef\u653e\u5927', text:`90\u5929\u589e\u957f\u8f83\u597d\u7684\u5e02\u573a\uff1a${names(growFast)}\u3002\u5176\u4e2d motorcycle windshield extension \u589e\u957f ${signedPct(growFast.find(d=>d.market==='motorcycle windshield extension')?.growth90)}\uff0c\u4f46\u9700\u540c\u6b65\u770b\u9000\u8d27\u548c\u9002\u914d\u98ce\u9669\u3002`},
+    {cls:'risk', title:'\u9700\u6c42\u56de\u843d\u5e02\u573a', tag:'\u8c28\u614e\u6295\u5165', text:`90\u5929\u589e\u957f\u4e3a\u8d1f\u7684\u91cd\u70b9\u5e02\u573a\uff1a${names(decline)}\u3002\u8fd9\u7c7b\u5e02\u573a\u4e0d\u5efa\u8bae\u53ea\u56e0\u4e3a\u5ba2\u5355\u4ef7\u9ad8\u5c31\u653e\u5927\uff0c\u9700\u5148\u786e\u8ba4ABA\u540c\u5b63\u8d8b\u52bf\u548c\u6392\u540d\u8986\u76d6\u3002`},
+    {cls:'good', title:'\u8f6c\u5316\u6548\u7387\u4f18\u52bf', tag:'\u627f\u63a5\u597d', text:`\u6309\u201c90\u5929\u641c\u7d22\u5bf9\u5e94\u9500\u91cf\u201d\u770b\uff0c\u6548\u7387\u8f83\u9ad8\u7684\u5e02\u573a\uff1a${names(efficient)}\u3002\u8fd9\u7c7b\u66f4\u9002\u5408\u4f5c\u4e3a\u7a33\u5b9a\u627f\u63a5\u548c\u5229\u6da6\u6d4b\u8bd5\u65b9\u5411\u3002`},
+    {cls:'risk', title:'\u9000\u8d27/\u9002\u914d\u98ce\u9669', tag:'\u9700\u63a7\u98ce\u9669', text:`\u9000\u8d27\u7387\u504f\u9ad8\u7684\u5e02\u573a\uff1a${names(highReturn)}\u3002\u6b64\u7c7b\u8bcd\u5373\u4f7f\u6709\u641c\u7d22\u589e\u957f\uff0c\u4e5f\u9700\u4f18\u5148\u8865\u8f66\u578b\u9002\u914d\u8868\u3001\u5b89\u88c5\u56fe/\u89c6\u9891\u548c\u552e\u524d\u786e\u8ba4\u3002`},
+    {cls:'good', title:'\u9ad8\u5ba2\u5355\u4ef7\u5e02\u573a', tag:'\u5229\u6da6\u6d4b\u8bd5', text:`\u5747\u4ef7\u8d85\u8fc7 $200 \u7684\u5e02\u573a\uff1a${names(highValue)}\u3002\u9002\u5408\u5c0f\u6279\u91cf\u6d4b\u8bd5\u9ad8\u4ef7SKU\uff0c\u4f46\u8981\u7528\u9002\u914d\u51c6\u786e\u6027\u548c\u8bc4\u4ef7\u4fe1\u4efb\u964d\u4f4e\u8d2d\u4e70\u95e8\u69db\u3002`}
+  ];
+  document.getElementById('segmentSummary').innerHTML = cards.map(c=>`<div class="diagnosis ${c.cls}"><h4>${c.title}</h4><p>${c.text}</p><span class="tag">${c.tag}</span></div>`).join('');
+}
+renderSegmentSummary();
+
+document.querySelector('#segTable tbody').innerHTML = DATA.segments.sort((a,b)=>b.search90-a.search90).map(d=>`<tr><td><b>${d.market}</b></td><td class="num">${fmt(d.search90)}</td><td class="num ${clsDelta(d.growth90)}">${signedPct(d.growth90)}</td><td class="num">${fmt(d.search360)}</td><td class="num ${clsDelta(d.growth180)}">${signedPct(d.growth180)}</td><td class="num">${fmt(d.salesLow)}–${fmt(d.salesHigh)}</td><td class="num">${money(d.avgPrice)}</td><td class="num">${money(d.minPrice)}–${money(d.maxPrice)}</td><td class="num ${d.returnRate>6?'down':'flat'}">${pct(d.returnRate)}</td></tr>`).join('');
+
+
+
+
+
+
+function histForTerm(term){ return DATA.history.find(h=>h.term===term) || null; }
+function termForInsight(title){
+  const t = title.toLowerCase();
+  let exact = DATA.currentTerms.find(r=>r.term.toLowerCase()===t);
+  if(exact) return exact;
+  return DATA.currentTerms.find(r=> t.includes(r.term.toLowerCase()) || r.term.toLowerCase().includes(t));
+}
+function seasonStats(title){
+  const term = termForInsight(title);
+  if(!term) return {term:null, hist:null, q1:null, q2:null, q3:null, q4:null, q3q4Avg:null, peakAvg:null, latest:null, yoy:null, qoq:null, ratio:null, q2ToQ3Pct:null, q3ToQ4Pct:null, q2ToQ4Pct:null, q3q4VsQ2Pct:null, seasonPattern:'未匹配到ABA趋势', q3q4Rising:false, q3q4Weak:false, q3q4NeedPrepare:false, q3q4MissingSeasonRisk:false, signal:'noaba'};
+  const hist = histForTerm(term.term);
+  const q1 = hist?.['2025Q1'];
+  const q2 = hist?.['2025Q2'];
+  const q3 = hist?.['2025Q3'];
+  const q4 = hist?.['2025Q4'];
+  const latest = term.search_volume;
+  const vals = [q3,q4].filter(v=>v!==null && v!==undefined);
+  const q3q4Avg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  const peakAvg = q3q4Avg;
+  const ratio = q3q4Avg ? latest/q3q4Avg*100 : null;
+  const yoy = term.yoy_search_pct;
+  const qoq = term.qoq_search_pct;
+  const pctChange = (a,b)=> (a!==null && a!==undefined && b!==null && b!==undefined && a!==0) ? (b-a)/a*100 : null;
+  const q2ToQ3Pct = pctChange(q2,q3);
+  const q3ToQ4Pct = pctChange(q3,q4);
+  const q2ToQ4Pct = pctChange(q2,q4);
+  const q3q4VsQ2Pct = (q2 && q3q4Avg!==null) ? (q3q4Avg-q2)/q2*100 : null;
+  let seasonPattern = 'Q3-Q4节奏不明显';
+  if(q2!==null && q2!==undefined && q3!==null && q3!==undefined && q4!==null && q4!==undefined){
+    if(q3 >= q2*1.1 && q4 >= q3*1.1) seasonPattern = 'Q3启动、Q4继续放大';
+    else if(q3 >= q2*1.1 && q4 >= q3*0.9) seasonPattern = 'Q3放大并在Q4维持高位';
+    else if(q4 >= q2*1.15 && q4 >= q3*1.1) seasonPattern = 'Q4集中放大';
+    else if(q3q4Avg >= q2*1.1) seasonPattern = 'Q3-Q4整体高于Q2';
+    else if(q3q4Avg <= q2*0.9) seasonPattern = 'Q3-Q4整体低于Q2';
+    else seasonPattern = 'Q3-Q4与Q2接近';
+  }
+  const q3q4Rising = q3q4VsQ2Pct!==null && q3q4VsQ2Pct>=10;
+  const q3q4Weak = q3q4VsQ2Pct!==null && q3q4VsQ2Pct<=-10;
+  const q3q4NeedPrepare = q3q4Rising && (yoy===null || yoy===undefined || yoy>=0 || (ratio!==null && ratio>=70));
+  const q3q4MissingSeasonRisk = q3q4Rising && yoy!==null && yoy!==undefined && yoy<0;
+  let signal = 'observe';
+  if(q3q4MissingSeasonRisk && yoy<=-10) signal = 'upcomingSeasonRisk';
+  else if(yoy!==null && yoy!==undefined && yoy>=10 && q3q4NeedPrepare) signal = 'q3q4Prepare';
+  else if(yoy!==null && yoy!==undefined && yoy>=10) signal = 'realGrowth';
+  else if(yoy!==null && yoy!==undefined && yoy<=-10 && (ratio===null || ratio<85)) signal = 'realDecline';
+  else if(ratio!==null && ratio<85 && (yoy===null || yoy===undefined)) signal = 'seasonalLowNeedVerify';
+  else if(qoq!==null && qoq!==undefined && qoq<0 && (yoy===null || yoy===undefined || yoy>=-5)) signal = 'seasonalPullback';
+  else if(ratio!==null && ratio>=85) signal = 'nearPeak';
+  return {term, hist, q1, q2, q3, q4, q3q4Avg, peakAvg, latest, yoy, qoq, ratio, q2ToQ3Pct, q3ToQ4Pct, q2ToQ4Pct, q3q4VsQ2Pct, seasonPattern, q3q4Rising, q3q4Weak, q3q4NeedPrepare, q3q4MissingSeasonRisk, signal};
+}
+function seasonText(ss){
+  if(!ss.term) return '未匹配到ABA季度趋势，主要参考细分市场数据。';
+  const ratioText = ss.ratio===null ? '—' : `${ss.ratio.toFixed(0)}%`;
+  const q3q4 = ss.q3q4Avg===null ? '—' : fmt(Math.round(ss.q3q4Avg));
+  return `ABA全年淡旺季校验：2025Q1 ${fmt(ss.q1)}、Q2 ${fmt(ss.q2)}、Q3 ${fmt(ss.q3)}、Q4 ${fmt(ss.q4)}；去年Q2→Q3 ${signedPct(ss.q2ToQ3Pct)}，Q3→Q4 ${signedPct(ss.q3ToQ4Pct)}，Q2→Q4 ${signedPct(ss.q2ToQ4Pct)}，判断为“${ss.seasonPattern}”。2026Q2 ${fmt(ss.latest)}，相当于去年Q3-Q4均值 ${q3q4} 的 ${ratioText}，同季变化 ${signedPct(ss.yoy)}。`;
+}
+
+function demandLabel(ss, isRisk=false){
+  if(ss.signal==='q3q4Prepare') return 'Q3-Q4提前布局';
+  if(ss.signal==='upcomingSeasonRisk') return 'Q3-Q4承接风险';
+  if(ss.signal==='realGrowth') return '同季需求增长';
+  if(ss.signal==='realDecline') return '同季需求下滑';
+  if(ss.signal==='seasonalPullback') return '季节性回落';
+  if(ss.signal==='seasonalLowNeedVerify') return '低于旺季水位';
+  if(ss.signal==='nearPeak') return '接近去年旺季';
+  return isRisk ? '风险提醒' : '机会方向';
+}
+function demandConclusion(ss){
+  if(!ss.term) return '未匹配到ABA季度趋势，本条主要参考细分市场数据。';
+  const ratioText = ss.ratio===null ? '—' : `${ss.ratio.toFixed(0)}%`;
+  if(ss.signal==='q3q4Prepare') return `2026Q2较2025Q2增长 ${signedPct(ss.yoy)}；同时去年走势为“${ss.seasonPattern}”，Q3-Q4均值较Q2 ${signedPct(ss.q3q4VsQ2Pct)}。这说明机会不只发生在Q2，Q2结束后仍要为Q3-Q4做承接。`;
+  if(ss.signal==='upcomingSeasonRisk') return `2026Q2较2025Q2下滑 ${signedPct(ss.yoy)}，但去年走势为“${ss.seasonPattern}”，Q3-Q4本应比Q2更强。这里的风险不是简单淡季，而是可能在旺季前丢失排名、曝光或转化承接。`;
+  if(ss.signal==='realGrowth'){
+    if(ss.q3q4Weak) return `2026Q2较2025Q2增长 ${signedPct(ss.yoy)}，但去年Q3-Q4没有明显放大，机会更偏当期效率或结构性增长，不建议直接按旺季大幅备货。`;
+    return `2026Q2较2025Q2增长 ${signedPct(ss.yoy)}，并达到去年Q3-Q4均值的 ${ratioText}，说明需求不只是季节性波动，可按偏强处理。`;
+  }
+  if(ss.signal==='realDecline') return `2026Q2较2025Q2下滑 ${signedPct(ss.yoy)}，且仅为去年Q3-Q4旺季均值的 ${ratioText}，需按真实需求压力或覆盖流失谨慎处理。`;
+  if(ss.signal==='seasonalPullback') return `当期环比回落，但同比未明显转弱；需要结合去年全年节奏判断，不能只凭环比把它判定为需求衰退。`;
+  if(ss.signal==='seasonalLowNeedVerify') return `当前低于去年Q3-Q4旺季水位，但缺少同比数据支撑，需结合排名、广告覆盖和细分市场继续验证。`;
+  if(ss.signal==='nearPeak') return `2026Q2已达到去年Q3-Q4旺季均值的 ${ratioText}，需求水位接近旺季；若去年Q3-Q4继续放大，可提前准备承接。`;
+  return `当前需求未出现极端增长或下滑，建议结合Q3-Q4前瞻稳定观察。`;
+}
+function q3q4Outlook(ss, isRisk=false){
+  if(!ss.term) return '未匹配到ABA全年趋势，Q3-Q4前瞻主要参考细分市场搜索、销量和退货数据。';
+  if(isRisk){
+    if(ss.q3q4MissingSeasonRisk) return `去年${ss.seasonPattern}，Q3-Q4均值较Q2 ${signedPct(ss.q3q4VsQ2Pct)}，但今年Q2同季变化为 ${signedPct(ss.yoy)}。如果不排查曝光、排名、价格和适配问题，Q3-Q4可能错过原本应放大的旺季需求。`;
+    if(ss.q3q4Rising) return `去年Q3-Q4仍高于Q2，风险处理不要简单“一刀切”砍量；应先保留高转化词和核心SKU，再控制低效投放与高退货SKU。`;
+    if(ss.q3q4Weak) return `去年Q3-Q4低于Q2，说明后续旺季放大不明显；若当前细分市场也回落，应控制补货和广告放量。`;
+    return `去年Q3-Q4与Q2接近，后续更看排名、评价、价格和适配承接，不建议仅凭季节判断风险大小。`;
+  }
+  if(ss.q3q4NeedPrepare) return `去年${ss.seasonPattern}，Q3-Q4均值较Q2 ${signedPct(ss.q3q4VsQ2Pct)}；Q2已结束，建议提前锁定Q3-Q4广告词包、库存水位、主推SKU和车型适配内容。`;
+  if(ss.q3q4Weak) return `去年Q3-Q4没有放大，机会更偏短期效率或细分结构机会；建议小步测试，不按旺季逻辑大幅备货。`;
+  return `去年Q3-Q4与Q2接近，可保持稳定投放，优先把预算给点击、加购、购买承接更好的SKU。`;
+}
+function seasonAwareScore(item, isRisk=false){
+  const ss = seasonStats(item.title);
+  let score = 0;
+  if(isRisk){
+    if(ss.signal==='upcomingSeasonRisk') score += 95;
+    else if(ss.signal==='realDecline') score += 80;
+    else if(ss.signal==='seasonalLowNeedVerify') score += 45;
+    else if(ss.signal==='seasonalPullback') score += 15;
+    else if(ss.signal==='q3q4Prepare' || ss.signal==='realGrowth') score -= 35;
+    if(ss.q3q4MissingSeasonRisk) score += 25;
+    if(ss.q3q4Rising && ss.yoy!==null && ss.yoy!==undefined && ss.yoy<5) score += 15;
+    if(ss.q3q4Weak && ss.signal!=='realDecline') score += 5;
+    if((item.reason||'').includes('退货率')) score += 25;
+    if((item.reason||'').includes('90天搜索增长 -') || (item.reason||'').includes('90天增长 -')) score += 20;
+  } else {
+    if(ss.signal==='q3q4Prepare') score += 95;
+    else if(ss.signal==='realGrowth') score += 80;
+    else if(ss.signal==='nearPeak') score += 45;
+    else if(ss.signal==='seasonalPullback') score += 15;
+    else if(ss.signal==='upcomingSeasonRisk') score -= 40;
+    else if(ss.signal==='realDecline') score -= 50;
+    if(ss.q3q4NeedPrepare) score += 20;
+    if(ss.q3q4Weak) score -= 10;
+    if((item.reason||'').includes('购买份额高于曝光') || (item.reason||'').includes('购买份额较曝光高')) score += 35;
+    if((item.reason||'').includes('90天搜索增长') || (item.reason||'').includes('90天增长')) score += 15;
+  }
+  return score;
+}
+function uniqInsights(items){
+  const map = new Map();
+  items.forEach(it=>{
+    const key = (it.title || '').trim().toLowerCase();
+    if(!key) return;
+    if(!map.has(key)) map.set(key, {...it, _reasons:[it.reason].filter(Boolean), _actions:[it.action].filter(Boolean), _types:[it.type].filter(Boolean)});
+    else {
+      const cur = map.get(key);
+      [it.reason].filter(Boolean).forEach(r=>{ if(!cur._reasons.includes(r)) cur._reasons.push(r); });
+      [it.action].filter(Boolean).forEach(a=>{ if(!cur._actions.includes(a)) cur._actions.push(a); });
+      [it.type].filter(Boolean).forEach(t=>{ if(!cur._types.includes(t)) cur._types.push(t); });
+      if((it.reason||'').length > (cur.reason||'').length) cur.reason = it.reason;
+      if(!cur.action && it.action) cur.action = it.action;
+      if(!cur.type && it.type) cur.type = it.type;
+    }
+  });
+  return Array.from(map.values()).map(it=>{
+    const reasons = (it._reasons || []).filter(Boolean);
+    const actions = (it._actions || []).filter(Boolean);
+    const types = (it._types || []).filter(Boolean);
+    return {
+      ...it,
+      reason: reasons.length ? reasons.join('\uff1b') : (it.reason || ''),
+      action: actions.length ? actions[0] : it.action,
+      type: types.length ? types.join(' + ') : it.type
+    };
+  });
+}
+function exclusiveOpportunityRisk(opps, risks){
+  const oppMap = new Map(opps.map(it=>[(it.title||'').trim().toLowerCase(), it]));
+  const riskMap = new Map(risks.map(it=>[(it.title||'').trim().toLowerCase(), it]));
+  const keepOpp = [];
+  const keepRisk = [];
+  opps.forEach(opp=>{
+    const key = (opp.title||'').trim().toLowerCase();
+    const risk = riskMap.get(key);
+    if(!risk){ keepOpp.push(opp); return; }
+    const ss = seasonStats(opp.title);
+    const chooseOpp = (ss.signal==='q3q4Prepare' || ss.signal==='realGrowth' || ss.signal==='nearPeak') && opp._score >= risk._score - 20;
+    if(chooseOpp){
+      opp.reason = `${opp.reason || ''}\uff1b\u98ce\u9669\u63d0\u793a\uff1a${risk.reason || '\u540c\u65f6\u5b58\u5728\u98ce\u9669\u4fe1\u53f7'}`;
+      if(!opp.action || opp.action.includes('\u8bc4\u4f30SKU')) opp.action = defaultAction(opp, ss, false);
+      opp.action = `${opp.action}\uff1b\u540c\u65f6\u63a7\u5236\u9000\u8d27/\u9002\u914d\u98ce\u9669\uff0c\u4e0d\u5355\u72ec\u653e\u5230\u5371\u9669\u70b9\u91cd\u590d\u5c55\u793a\u3002`;
+      risk._mergedToOpp = true;
+      keepOpp.push(opp);
+    } else {
+      risk.reason = `${risk.reason || ''}\uff1b\u673a\u4f1a\u4fe1\u53f7\uff1a${opp.reason || '\u540c\u65f6\u5b58\u5728\u673a\u4f1a\u4fe1\u53f7'}`;
+      risk.action = `${defaultAction(risk, ss, true)}\uff1b\u56e0\u540c\u8bcd\u5df2\u5f52\u5165\u5371\u9669\u70b9\uff0c\u673a\u4f1a\u4fa7\u4e0d\u518d\u91cd\u590d\u5c55\u793a\u3002`;
+    }
+  });
+  risks.forEach(risk=>{
+    const key = (risk.title||'').trim().toLowerCase();
+    if(risk._mergedToOpp) return;
+    const opp = oppMap.get(key);
+    if(!opp) keepRisk.push(risk);
+    else if(!keepOpp.some(x=>(x.title||'').trim().toLowerCase()===key)) keepRisk.push(risk);
+  });
+  return {opps:keepOpp, risks:keepRisk};
+}
+
+
+function compactReason(item, ss){
+  const base = item.reason || '—';
+  const term = ss.term;
+  const parts = [];
+  if(term){
+    parts.push(`ABA搜索 ${fmt(term.search_volume)}`);
+    if(term.yoy_search_pct!==null && term.yoy_search_pct!==undefined) parts.push(`同比 ${signedPct(term.yoy_search_pct)}`);
+    if(term.qoq_search_pct!==null && term.qoq_search_pct!==undefined) parts.push(`环比 ${signedPct(term.qoq_search_pct)}`);
+    const brandGap = term.purchase_vs_impr;
+    if(brandGap!==null && brandGap!==undefined){
+      if(brandGap>=5) parts.push(`购买强于曝光 ${brandGap.toFixed(1)}pct`);
+      else if(brandGap<=-5) parts.push(`购买弱于曝光 ${brandGap.toFixed(1)}pct`);
+    }
+  }
+  const m90 = base.match(/90天搜索\s*([\d,]+)/);
+  const g90 = base.match(/90天(?:搜索)?增长\s*(-?\d+(?:\.\d+)?)%/);
+  const ret = base.match(/退货率\s*(\d+(?:\.\d+)?)%/);
+  if(m90) parts.push(`细分90天 ${m90[1]}`);
+  if(g90) parts.push(`90天增长 ${g90[1]}%`);
+  if(ret) parts.push(`退货率 ${ret[1]}%`);
+  const uniq = [];
+  parts.forEach(x=>{ if(x && !uniq.includes(x)) uniq.push(x); });
+  return uniq.slice(0,4).join('；') || base.split('；').slice(0,1).join('；');
+}
+function compactDemand(ss){
+  if(!ss.term) return '未匹配ABA，参考细分市场。';
+  if(ss.signal==='q3q4Prepare') return `同比 ${signedPct(ss.yoy)}，去年Q3-Q4放大，提前承接。`;
+  if(ss.signal==='upcomingSeasonRisk') return `同比 ${signedPct(ss.yoy)}，但去年Q3-Q4应放大，警惕承接流失。`;
+  if(ss.signal==='realGrowth') return `同比 ${signedPct(ss.yoy)}，需求偏强。`;
+  if(ss.signal==='realDecline') return `同比 ${signedPct(ss.yoy)}，需谨慎控量。`;
+  if(ss.signal==='seasonalPullback') return '环比回落，同季未弱，按季节波动观察。';
+  if(ss.signal==='nearPeak') return '接近去年Q3-Q4水位，可看效率放量。';
+  return '需求平稳，继续观察Q3-Q4节奏。';
+}
+function compactSeason(ss){
+  if(!ss.term) return '\u2014';
+  return `2025Q2 ${fmt(ss.q2)} \u2192 Q3 ${fmt(ss.q3)} \u2192 Q4 ${fmt(ss.q4)}\uff1bQ3-Q4 vs Q2 ${signedPct(ss.q3q4VsQ2Pct)}\u3002`;
+}
+
+function q3q4ForwardInsight(ss, isRisk=false){
+  if(!ss.term) return isRisk ? '看细分市场回落和退货风险。' : '先小预算验证承接。';
+  const season = `去年Q3-Q4 vs Q2 ${signedPct(ss.q3q4VsQ2Pct)}`;
+  if(isRisk){
+    if(ss.q3q4MissingSeasonRisk) return `${season}；先查排名/曝光/转化。`;
+    if(ss.q3q4Rising) return `${season}；保留高转化SKU，不一刀切。`;
+    if(ss.q3q4Weak) return `${season}；Q3-Q4偏控量。`;
+    return `${season}；重点看转化和退货。`;
+  }
+  if(ss.q3q4NeedPrepare) return `${season}；提前布局广告、库存、主推SKU。`;
+  if(ss.q3q4Weak) return `${season}；偏短期测试，不大幅备货。`;
+  return `${season}；按点击/加购/购买效率放量。`;
+}
+
+function compactOutlook(ss, isRisk=false){
+  if(!ss.term) return isRisk ? '\u4f18\u5148\u770b\u7ec6\u5206\u5e02\u573a\u9000\u8d27\u3001\u9002\u914d\u548c\u9500\u91cf\u627f\u63a5\u3002' : '\u5148\u5c0f\u9884\u7b97\u9a8c\u8bc1\u7ec6\u5206\u5e02\u573a\u627f\u63a5\u3002';
+  if(isRisk){
+    if(ss.q3q4MissingSeasonRisk) return '\u5148\u6392\u67e5\u6392\u540d/\u66dd\u5149/\u4ef7\u683c/\u9002\u914d\uff0c\u4fdd\u7559\u9ad8\u8f6c\u5316SKU\u627f\u63a5Q3-Q4\u3002';
+    if(ss.q3q4Rising) return '\u4e0d\u8981\u4e00\u5200\u5207\u780d\u91cf\uff0c\u4fdd\u6838\u5fc3\u8bcd\uff0c\u63a7\u4f4e\u6548\u8bcd\u548c\u9ad8\u9000\u8d27SKU\u3002';
+    if(ss.q3q4Weak) return '\u540e\u7eed\u65fa\u5b63\u4e0d\u660e\u663e\uff0c\u63a7\u5236\u8865\u8d27\u548c\u5e7f\u544a\u653e\u91cf\u3002';
+    return '\u4fdd\u6301\u89c2\u5bdf\uff0c\u91cd\u70b9\u770b\u8f6c\u5316\u548c\u9000\u8d27\u662f\u5426\u6076\u5316\u3002';
+  }
+  if(ss.q3q4NeedPrepare) return '\u63d0\u524d\u51c6\u5907\u5e7f\u544a\u8bcd\u5305\u3001\u5e93\u5b58\u3001\u4e3b\u63a8SKU\u548c\u8f66\u578b\u9002\u914d\u5185\u5bb9\u3002';
+  if(ss.q3q4Weak) return '\u673a\u4f1a\u504f\u77ed\u671f\u6d4b\u8bd5\uff0c\u4e0d\u6309\u65fa\u5b63\u5927\u5e45\u5907\u8d27\u3002';
+  return '\u7a33\u5b9a\u6295\u653e\uff0c\u9884\u7b97\u4f18\u5148\u7ed9\u8f6c\u5316\u66f4\u597d\u7684SKU\u3002';
+}
+function defaultAction(item, ss, isRisk=false){
+  if(item.action && !(ss.signal==='realDecline' && !isRisk) && !(ss.signal==='upcomingSeasonRisk' && isRisk) && !(ss.signal==='q3q4Prepare' && !isRisk)) return item.action;
+  const t = item.type || '';
+  if(isRisk){
+    if(ss.signal==='upcomingSeasonRisk') return '不要简单按淡季砍量；先排查自然排名、广告曝光、价格竞争力和车型适配，再保留高转化SKU承接Q3-Q4，同时控制低效词和高退货SKU。';
+    if(ss.signal==='seasonalPullback') return '先按季节性回落观察，不直接砍预算；重点看排名、转化和库存周转是否同步变差，并为Q3-Q4保留核心承接能力。';
+    if(ss.signal==='realDecline') return '按真实需求压力处理：控制补货和预算放量，优先保留高转化词与核心SKU；若去年Q3-Q4会放大，还要避免过早退出旺季词包。';
+    if(t.includes('同比')) return '复查该词自然排名和广告覆盖，避免在需求下滑时盲目加预算；若去年Q3-Q4本应抬升，则同步检查是否丢曝光。';
+    if(t.includes('短期')) return '控制补货和广告放量节奏，等待需求修复或转向增长词；Q3-Q4前只保留转化效率更确定的SKU。';
+    return '先排查需求、退货、适配和成交条件，再决定是否继续放量；Q3-Q4前重点防止高退货SKU拖累旺季承接。';
+  }
+  if(ss.signal==='q3q4Prepare') return '提前放大Q3-Q4承接环节：广告词包、自然排名、库存水位、核心车型SKU、详情页适配信息和评价信任一起准备。';
+  if(ss.signal==='realDecline' || ss.signal==='upcomingSeasonRisk') return '不建议直接放大；先确认是否丢排名/丢曝光，并用小预算测试高转化SKU，确认Q3-Q4承接能力后再加量。';
+  if(t.includes('补曝光')) return '优先补前端曝光：广告卡位、自然排名、核心词覆盖和重点SKU展示，同时提前锁定Q3-Q4旺季词包。';
+  if(t.includes('需求增长') || ss.signal==='realGrowth') return '放大前端曝光/搜索流量，同时保持点击、加购、购买效率；若去年Q3-Q4有放大，应提前做库存和预算节奏。';
+  if(ss.q3q4Weak) return '评估SKU覆盖、价格带和广告词包，先做小预算测试；因去年Q3-Q4没有明显放大，不建议按旺季大幅备货。';
+  return '评估SKU覆盖、价格带和广告词包，作为新增投放或上新测试方向，并根据Q3-Q4前瞻决定是否提前备货。';
+}
+function insightCard(item, idx, isRisk=false){
+  const ss = seasonStats(item.title);
+  const demand = demandLabel(ss, isRisk);
+  const action = defaultAction(item, ss, isRisk);
+  const tags = [demand];
+  if(item.type && item.type!==demand) tags.unshift(item.type);
+  return `<div class="insight ${isRisk?'risk':''}">
+    <h4><span class="rank">${idx+1}</span>${item.title}</h4>
+    <div class="meta-line">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <p><b>依据：</b>${compactReason(item, ss)}</p>
+    <p><b>判断：</b>${compactDemand(ss)} ${q3q4ForwardInsight(ss, isRisk)}</p>
+    <p><b>动作：</b>${compactOutlook(ss, isRisk)}</p>
+  </div>`;
+}
+function renderOpportunityRisk(){
+  const oppRaw = uniqInsights(DATA.opportunities || [])
+    .map(it=>({...it, _score:seasonAwareScore(it,false)}))
+    .filter(it=>it._score>-30)
+    .sort((a,b)=>b._score-a._score);
+  const riskRaw = uniqInsights(DATA.risks || [])
+    .map(it=>({...it, _score:seasonAwareScore(it,true)}))
+    .filter(it=>it._score>0)
+    .sort((a,b)=>b._score-a._score);
+  const merged = exclusiveOpportunityRisk(oppRaw, riskRaw);
+  const opps = merged.opps.sort((a,b)=>b._score-a._score).slice(0,10);
+  const risks = merged.risks.sort((a,b)=>b._score-a._score).slice(0,10);
+  document.getElementById('oppList').innerHTML = opps.map((it,i)=>insightCard(it,i,false)).join('') || '<div class="note">\u6682\u65e0\u673a\u4f1a\u70b9\u3002</div>';
+  document.getElementById('riskList').innerHTML = risks.map((it,i)=>insightCard(it,i,true)).join('') || '<div class="note">\u6682\u65e0\u5371\u9669\u70b9\u3002</div>';
+}
+renderOpportunityRisk();
+function initAnalysisPagination(){
+  const pageIds = ['trend','brand','segments','opprisk'];
+  const sectionIds = ['demand','keywords','brand','segments','opprisk'];
+  const tabs = Array.from(document.querySelectorAll('.page-tabs a[data-page]'));
+  const pages = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  if(!tabs.length || !pages.length) return;
+
+  function normalizePage(id){
+    if(id === 'demand' || id === 'keywords') return 'trend';
+    return pageIds.includes(id) ? id : 'trend';
+  }
+
+  function showPage(id, updateHash=true){
+    id = normalizePage(id);
+    pages.forEach(page => {
+      const on = id === 'trend' ? (page.id === 'demand' || page.id === 'keywords') : page.id === id;
+      page.classList.toggle('is-hidden', !on);
+      page.classList.toggle('active-page', on);
+    });
+    tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.page === id));
+    if(updateHash) history.replaceState(null, '', '#' + id);
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', e => {
+      e.preventDefault();
+      showPage(tab.dataset.page, true);
+      const nav = document.querySelector('.page-tabs');
+      if(nav) nav.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  window.addEventListener('hashchange', () => showPage(location.hash.replace('#',''), false));
+  showPage(location.hash.replace('#','') || 'trend', false);
+}
+initAnalysisPagination();
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
