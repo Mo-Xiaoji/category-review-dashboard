@@ -1161,7 +1161,7 @@ function renderLandscapeInsights(stats, mode) {
   const danger=[];
   const topCellKmShare=topCell&&topCell.cell.qty?topCell.cell.kemQty/topCell.cell.qty:0;
   const topCellMarketShare=topCell&&stats.total.qty?topCell.cell.qty/stats.total.qty:0;
-  if(topCell && topCellMarketShare>=0.05 && topCellKmShare<oppThreshold) danger.push(`核心市场低渗透：<b>${topCell.model} × ${topCell.band}</b> 是最大市场格，市场销量占比 <b>${pctFine(topCellMarketShare)}</b>，但 KM 渗透率仅 <b>${pctFine(topCellKmShare)}</b>，低于参考线 <b>${pctFine(oppThreshold)}</b>。`);
+  if(topCell && topCellMarketShare>=0.05 && topCellKmShare<oppThreshold) danger.push(`核心市场低渗透：<b>${topCell.model} × ${topCell.band}</b> 是最大市场格，市场销量占比 <b>${pctFine(topCellMarketShare)}</b>，但 KM 渗透率仅 <b>${pctFine(topCellKmShare)}</b>，低于参考线 <b>${pctFine(kmOverallQtyShare)}</b>。`);
   const competitorThreat=topBrandCells.filter(x=>String(x.top.name||'').toUpperCase()!=='KEMIMOTO').map(x=>({...x, marketShare:stats.total.qty?x.cell.qty/stats.total.qty:0, threatScore:(stats.total.qty?x.cell.qty/stats.total.qty:0)*(x.topShare||0)})).sort((a,b)=>b.threatScore-a.threatScore)[0];
   if(competitorThreat && competitorThreat.marketShare>=0.03) danger.push(`竞品压制风险：<b>${competitorThreat.model} × ${competitorThreat.band}</b> 中 Top 品牌为 <b>${displayBrandName(competitorThreat.top.name)}</b>，格内销量份额 <b>${pctFine(competitorThreat.topShare)}</b>，该格市场销量占比 <b>${pctFine(competitorThreat.marketShare)}</b>。`);
   if(noKmCell) danger.push(`有量无布局风险：<b>${noKmCell.model} × ${noKmCell.band}</b> 市场有销量（市场销量占比 <b>${pctFine(noKmCell.cell.qty/stats.total.qty)}</b>），但 KM 当前无销量布局，可能被竞品持续占位。`);

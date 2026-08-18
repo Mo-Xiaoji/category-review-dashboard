@@ -9,3 +9,5 @@ GitHub Pages 设置：
 - 首页：index.html
 
 Update: 2026-08-18 Golf Cart DS merged into Club Car DS for market and budget dashboards.
+
+Update: 2026-08-18 Unified opportunity/risk reference line text in secondary-model x price-band insights.
