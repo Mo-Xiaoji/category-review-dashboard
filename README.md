@@ -7,4 +7,5 @@ GitHub Pages 设置：
 - Branch：main
 - Folder：/root
 - 首页：index.html
-Update: 2026-08-18 01:40
+
+Update: 2026-08-18 Golf Cart DS merged into Club Car DS for market and budget dashboards.
