@@ -393,9 +393,6 @@
   body.page-market th{color:#0f172a!important;}
 </style>
 <!-- readability-audit-fix:end -->
-<style id="decision-upgrade-style">
-.decision-upgrade{max-width:1280px;margin:18px auto 20px;padding:0 24px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;color:#122033}.decision-upgrade *{box-sizing:border-box}.du-shell{background:linear-gradient(135deg,#ffffff,#f6fbff);border:1px solid #d7e2ef;border-radius:24px;box-shadow:0 14px 36px rgba(15,23,42,.08);padding:20px}.du-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.du-kicker{font-size:12px;font-weight:900;color:#1d4ed8;letter-spacing:.06em;text-transform:uppercase}.du-title{margin:4px 0 0;font-size:20px;font-weight:900;color:#102454}.du-link{display:inline-flex;white-space:nowrap;text-decoration:none;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800}.du-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.du-card{border:1px solid #e2eaf5;background:#fff;border-radius:16px;padding:14px}.du-card b{display:block;color:#111827;margin-bottom:6px;font-size:14px}.du-card span{display:block;color:#566579;line-height:1.6;font-size:13px}.du-foot{margin-top:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px 14px;line-height:1.65;font-size:13px}.du-chip{display:inline-block;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:900;margin-right:6px}.du-op{background:#dcfce7;color:#047857}.du-risk{background:#fee2e2;color:#b91c1c}.du-q{background:#eaf2ff;color:#1d4ed8}@media(max-width:900px){.du-head{flex-direction:column}.du-grid{grid-template-columns:1fr}.du-link{white-space:normal}}
-</style>
 </head>
 <body class="page-market">
 <style>
@@ -1164,7 +1161,7 @@ function renderLandscapeInsights(stats, mode) {
   const danger=[];
   const topCellKmShare=topCell&&topCell.cell.qty?topCell.cell.kemQty/topCell.cell.qty:0;
   const topCellMarketShare=topCell&&stats.total.qty?topCell.cell.qty/stats.total.qty:0;
-  if(topCell && topCellMarketShare>=0.05 && topCellKmShare<oppThreshold) danger.push(`核心市场低渗透：<b>${topCell.model} × ${topCell.band}</b> 是最大市场格，市场销量占比 <b>${pctFine(topCellMarketShare)}</b>，但 KM 渗透率仅 <b>${pctFine(topCellKmShare)}</b>，低于参考线 <b>${pctFine(kmOverallQtyShare)}</b>。`);
+  if(topCell && topCellMarketShare>=0.05 && topCellKmShare<oppThreshold) danger.push(`核心市场低渗透：<b>${topCell.model} × ${topCell.band}</b> 是最大市场格，市场销量占比 <b>${pctFine(topCellMarketShare)}</b>，但 KM 渗透率仅 <b>${pctFine(topCellKmShare)}</b>，低于参考线 <b>${pctFine(oppThreshold)}</b>。`);
   const competitorThreat=topBrandCells.filter(x=>String(x.top.name||'').toUpperCase()!=='KEMIMOTO').map(x=>({...x, marketShare:stats.total.qty?x.cell.qty/stats.total.qty:0, threatScore:(stats.total.qty?x.cell.qty/stats.total.qty:0)*(x.topShare||0)})).sort((a,b)=>b.threatScore-a.threatScore)[0];
   if(competitorThreat && competitorThreat.marketShare>=0.03) danger.push(`竞品压制风险：<b>${competitorThreat.model} × ${competitorThreat.band}</b> 中 Top 品牌为 <b>${displayBrandName(competitorThreat.top.name)}</b>，格内销量份额 <b>${pctFine(competitorThreat.topShare)}</b>，该格市场销量占比 <b>${pctFine(competitorThreat.marketShare)}</b>。`);
   if(noKmCell) danger.push(`有量无布局风险：<b>${noKmCell.model} × ${noKmCell.band}</b> 市场有销量（市场销量占比 <b>${pctFine(noKmCell.cell.qty/stats.total.qty)}</b>），但 KM 当前无销量布局，可能被竞品持续占位。`);
@@ -1400,7 +1397,6 @@ setupSelects(); setActivePage(state.page); update();
 </script>
 </body>
 </html>
-
 
 
 

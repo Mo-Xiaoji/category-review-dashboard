@@ -3,211 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品类复盘中心｜多页面网站</title>
+  <title>挡风品类复盘决策中心｜升级版</title>
   <style>
-    :root{
-      --bg:#f6f8fb; --panel:#ffffff; --ink:#152033; --muted:#637083;
-      --blue:#2563eb; --blue2:#1d4ed8; --line:#e5eaf2; --soft:#eff6ff;
-      --green:#059669; --orange:#d97706; --shadow:0 18px 45px rgba(15,23,42,.10);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--ink)}
-    .hero{padding:56px 28px 36px;background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 54%,#2563eb 100%);color:#fff}
-    .wrap{max-width:1180px;margin:0 auto}
-    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.10);font-size:13px;color:#dbeafe}
-    h1{margin:22px 0 12px;font-size:42px;line-height:1.15;letter-spacing:-.02em}
-    .subtitle{max-width:840px;font-size:17px;line-height:1.8;color:#dbeafe;margin:0}
-    .topnav{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-    .navin{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 28px;gap:16px}
-    .brand{font-weight:800;color:#172554}
-    .navlinks{display:flex;gap:10px;flex-wrap:wrap}
-    .navlinks a{color:#334155;text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;font-size:14px}
-    .navlinks a:hover{color:var(--blue);border-color:#bfdbfe;background:#eff6ff}
-    main{max-width:1180px;margin:0 auto;padding:30px 28px 56px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:10px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}
-    .card h2{font-size:24px;margin:0 0 12px}.card p{color:var(--muted);line-height:1.75;margin:0 0 18px}
-    .tags{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 22px}.tag{font-size:12px;color:#1e40af;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;padding:6px 9px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border-radius:12px;padding:11px 15px;font-weight:700;font-size:14px}
-    .primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.ghost{border:1px solid var(--line);color:#334155;background:#fff}.ghost:hover{border-color:#bfdbfe;color:var(--blue)}
-    .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0}.mini{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.mini b{display:block;font-size:20px;margin-bottom:6px}.mini span{color:var(--muted);font-size:13px;line-height:1.5}
-    .note{margin-top:22px;padding:16px 18px;border-radius:18px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.7}
-    footer{max-width:1180px;margin:0 auto;padding:0 28px 36px;color:#64748b;font-size:13px}
-    @media(max-width:820px){h1{font-size:32px}.grid,.summary{grid-template-columns:1fr}.navin{align-items:flex-start;flex-direction:column}}
+    :root{--bg:#edf4fb;--surface:#ffffff;--surface2:#f7fbff;--ink:#122033;--muted:#5d6b7c;--line:#d7e2ef;--blue:#1d4ed8;--blue2:#2563eb;--navy:#0f2f63;--green:#059669;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;--shadow:0 18px 48px rgba(15,23,42,.10);--radius:24px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 8% 0%,rgba(37,99,235,.18),transparent 34%),radial-gradient(circle at 92% 8%,rgba(5,150,105,.12),transparent 28%),linear-gradient(180deg,#dfeaf7 0,#edf4fb 360px,#f7f9fc 100%)}a{color:inherit}.wrap{max-width:1280px;margin:0 auto;padding:0 26px}.hero{padding:48px 0 28px;color:#fff;background:linear-gradient(135deg,#0b1f44 0%,#153f7e 48%,#2563eb 100%)}.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:26px;align-items:end}.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.10);font-size:13px;color:#dbeafe}.hero h1{margin:20px 0 12px;font-size:46px;line-height:1.12;letter-spacing:-.03em}.subtitle{font-size:17px;line-height:1.8;color:#dbeafe;max-width:820px;margin:0}.hero-panel{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:24px;padding:20px;backdrop-filter:blur(14px)}.hero-panel b{font-size:24px;display:block;margin-bottom:8px}.hero-panel p{margin:0;color:#dbeafe;line-height:1.65}.topnav{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 8px 24px rgba(15,23,42,.06)}.navin{max-width:1280px;margin:0 auto;padding:11px 26px;display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{font-weight:900;color:#172554}.navlinks{display:flex;gap:8px;flex-wrap:wrap}.navlinks a{text-decoration:none;border:1px solid var(--line);background:#fff;color:#334155;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700}.navlinks a:hover{color:var(--blue);background:#eff6ff;border-color:#bfdbfe}main{max-width:1280px;margin:0 auto;padding:28px 26px 58px}.section-title{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:26px 0 14px}.section-title h2{margin:0;font-size:24px;color:#102454}.section-title p{margin:6px 0 0;color:var(--muted);line-height:1.6}.grid{display:grid;gap:18px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi,.card,.route,.matrix,.action{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.kpi{padding:18px}.kpi .label{color:var(--muted);font-size:13px}.kpi b{display:block;margin:8px 0 4px;font-size:24px}.kpi span{font-size:13px;line-height:1.55;color:#475569}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800}.b-blue{background:#eaf2ff;color:#1d4ed8}.b-green{background:#dcfce7;color:#047857}.b-orange{background:#fff7ed;color:#c2410c}.b-red{background:#fee2e2;color:#b91c1c}.routes{grid-template-columns:repeat(4,minmax(0,1fr))}.route{padding:22px;position:relative;overflow:hidden}.route:before{content:"";position:absolute;right:-20px;top:-22px;width:86px;height:86px;border-radius:50%;background:rgba(37,99,235,.10)}.num{width:34px;height:34px;border-radius:12px;background:#eaf2ff;color:#1d4ed8;font-weight:900;display:flex;align-items:center;justify-content:center;margin-bottom:14px}.route h3{margin:0 0 9px;font-size:18px}.route p{margin:0;color:var(--muted);line-height:1.7;font-size:14px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:24px}.card h3{font-size:22px;margin:0 0 10px}.card p{color:var(--muted);line-height:1.75;margin:0 0 16px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.tag{font-size:12px;color:#1e40af;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;padding:6px 9px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;text-decoration:none;border-radius:13px;padding:11px 15px;font-weight:800;font-size:14px}.primary{background:var(--blue);color:#fff}.ghost{border:1px solid var(--line);background:#fff;color:#334155}.matrix{padding:20px;overflow:auto}.matrix table{width:100%;border-collapse:separate;border-spacing:0;min-width:920px;font-size:13px}.matrix th{background:#102454;color:#fff;text-align:left;padding:12px;border-right:1px solid rgba(255,255,255,.16)}.matrix td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}.matrix tr:nth-child(even) td{background:#f8fbff}.action{padding:22px;border-left:5px solid var(--blue)}.action h3{margin:0 0 10px}.action ul{margin:0;padding-left:20px;color:#334155;line-height:1.8}.two{grid-template-columns:1.05fr .95fr}.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:18px;padding:16px 18px;line-height:1.7}.footer{max-width:1280px;margin:0 auto;padding:0 26px 34px;color:#64748b;font-size:13px}@media(max-width:980px){.hero-grid,.kpis,.routes,.cards,.two{grid-template-columns:1fr}.hero h1{font-size:34px}.navin{align-items:flex-start;flex-direction:column}.navlinks{width:100%;overflow:auto;flex-wrap:nowrap}.navlinks a{white-space:nowrap}}
   </style>
-<!-- unified-category-theme:start -->
-<style>
-  :root{
-    --hub-bg:#eef4fb;
-    --hub-bg-2:#f4f7fb;
-    --hub-surface:#f8fbff;
-    --hub-surface-2:#f1f6fd;
-    --hub-ink:#111827;
-    --hub-muted:#475569;
-    --hub-blue:#2563eb;
-    --hub-blue-2:#1d4ed8;
-    --hub-blue-dark:#172554;
-    --hub-line:#d6e1ef;
-    --hub-soft:#eaf2ff;
-    --hub-shadow:0 12px 30px rgba(15,23,42,.08);
-    --hub-radius:22px;
-  }
-  html{scroll-behavior:smooth;}
-  body{
-    background:
-      radial-gradient(circle at 8% 0%,rgba(96,165,250,.16),transparent 34%),
-      radial-gradient(circle at 92% 8%,rgba(37,99,235,.10),transparent 30%),
-      linear-gradient(180deg,#e3edf8 0,#eef4fb 360px,#f4f7fb 100%)!important;
-    color:var(--hub-ink)!important;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
-  }
-  body a{color:var(--hub-blue);}
-
-  /* 全站顶部导航 */
-  .multipage-site-nav,.topnav{
-    position:sticky!important;top:0!important;z-index:9999!important;
-    background:rgba(248,251,255,.94)!important;backdrop-filter:blur(16px)!important;
-    border-bottom:1px solid var(--hub-line)!important;box-shadow:0 8px 24px rgba(15,23,42,.06)!important;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif!important;
-  }
-  .multipage-site-nav .inner,.topnav .navin{max-width:1280px!important;margin:0 auto!important;padding:10px 24px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;}
-  .multipage-site-nav .title,.topnav .brand{font-size:15px!important;font-weight:900!important;color:var(--hub-blue-dark)!important;letter-spacing:.01em!important;white-space:nowrap!important;}
-  .multipage-site-nav .links,.topnav .navlinks{display:flex!important;gap:8px!important;flex-wrap:wrap!important;}
-  .multipage-site-nav a,.topnav a{display:inline-flex!important;align-items:center!important;text-decoration:none!important;color:#334155!important;background:#fff!important;border:1px solid var(--hub-line)!important;border-radius:999px!important;padding:8px 12px!important;font-size:13px!important;line-height:1!important;font-weight:760!important;box-shadow:none!important;}
-  .multipage-site-nav a:hover,.topnav a:hover{color:var(--hub-blue)!important;background:var(--hub-soft)!important;border-color:#b7cff7!important;}
-
-  /* 页面标题区统一为深蓝渐变，强化辨识度 */
-  body>section.hero,body>header.hero,main.shell>header.hero,body>.wrap>header,body.page-market header{
-    background:linear-gradient(135deg,#172554 0%,#1e40af 58%,#3b82f6 100%)!important;
-    color:#fff!important;border:1px solid rgba(255,255,255,.14)!important;
-    box-shadow:0 18px 45px rgba(30,64,175,.18)!important;
-  }
-  body>section.hero,body>header.hero{padding:42px 28px 34px!important;}
-  main.shell>header.hero,body>.wrap>header,body.page-market header{border-radius:28px!important;padding:30px!important;margin:22px 0 20px!important;}
-  body>section.hero .wrap,body>header.hero .wrap{max-width:1280px!important;}
-  body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1,.hero h1{color:#fff!important;font-size:34px!important;line-height:1.18!important;letter-spacing:-.02em!important;font-weight:900!important;}
-  body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,main.shell>header.hero .subtitle,body.page-market header p,.hero p{color:#dbeafe!important;line-height:1.75!important;}
-  body>.wrap>header .badge,main.shell>header.hero .badge,.hero .badge,body.page-market header .badge,.eyebrow{background:rgba(255,255,255,.14)!important;color:#dbeafe!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:999px!important;}
-
-  /* 内容卡片：统一浅蓝白，减少纯白刺眼，同时保证文字对比度 */
-  body :where(.card,.kpi-card,.mini,.share-card,.kem-bs-card,.product,.table-card,.toolbar,.filters,.table-wrap,.tableBox,.summary-box,.formula-box){
-    background:linear-gradient(180deg,var(--hub-surface) 0%,var(--hub-surface-2) 100%)!important;
-    color:var(--hub-ink)!important;
-    border-color:var(--hub-line)!important;
-    box-shadow:var(--hub-shadow)!important;
-  }
-  body :where(.kpi,.kpis .kpi){
-    background:linear-gradient(180deg,#fbfdff 0%,#f0f6fd 100%)!important;
-    color:var(--hub-ink)!important;
-    border-color:var(--hub-line)!important;
-    box-shadow:var(--hub-shadow)!important;
-  }
-  body :where(h1,h2,h3,h4,.value,.kpi-value,.share-brand,.kem-bs-title){color:var(--hub-ink)!important;}
-  body :where(.hero h1,header h1,body>section.hero h1,body>header.hero h1,main.shell>header.hero h1,body>.wrap>header h1,body.page-market header h1){color:#fff!important;}
-  body :where(.muted,.subtitle,.hint,.kpi-label,.kpi-sub,.kpi .name,.kpi .delta,.sub,.share-label,.kem-bs-label,.meta,small){color:var(--hub-muted)!important;}
-  body :where(.hero .subtitle,body>section.hero p,body>header.hero p,main.shell>header.hero p,body>.wrap>header .subtitle,body.page-market header p){color:#dbeafe!important;}
-
-  /* 筛选与分页：统一底色，但保留状态色、业务标签、图表颜色 */
-  body :where(select,input){background:#f8fbff!important;color:var(--hub-ink)!important;border-color:#cbd5e1!important;}
-  body :where(.page-tabs,.pageTabs,.tabs,.filters,.toolbar){background:rgba(248,251,255,.88)!important;backdrop-filter:blur(14px)!important;border-color:var(--hub-line)!important;}
-  body :where(.tab,.mode-tab,.page-tabs a,.pageTabs button,.switches button,.pager button){background:#f8fbff!important;color:#334155!important;border-color:var(--hub-line)!important;}
-  body :where(.tab.active,.mode-tab.active,.page-tabs a.active,.pageTabs button.active,.switches button.active){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
-  body :where(button.primary,.btn.primary){background:var(--hub-blue)!important;color:#fff!important;border-color:var(--hub-blue)!important;}
-
-  /* 表格：统一可读性 */
-  body table{background:#f8fbff!important;color:var(--hub-ink)!important;}
-  body th{background:#eaf1fa!important;color:#263447!important;border-bottom-color:var(--hub-line)!important;}
-  body td{color:#111827!important;border-bottom-color:#dfe8f3!important;}
-  body tbody tr:nth-child(even) td{background:#f3f7fd!important;}
-  body tbody tr:hover td{background:#eef5ff!important;}
-  body :where(td:first-child,th:first-child){background:#eef5fc!important;}
-  body :where(tbody tr:hover td:first-child){background:#eef5ff!important;}
-
-  /* 硬挡风页原来是深色图表，统一浅色后单独补强图表轴线、说明条和热力表清晰度 */
-  body.page-market{--text:var(--hub-ink);--muted:#526071;--grid:#d8e3f0;--panel:var(--hub-surface);--panel2:var(--hub-surface-2);--card:var(--hub-surface);}
-  body.page-market .fieldGuide{background:#e6f6fb!important;color:#174151!important;border-color:#9bd9e7!important;}
-  body.page-market .fieldGuide b{color:#0f3a4a!important;}
-  body.page-market .axis{stroke:#64748b!important;opacity:.75!important;}
-  body.page-market .gridline{stroke:#d8e3f0!important;opacity:1!important;}
-  body.page-market svg text{fill:#526071!important;}
-  body.page-market .dot{stroke:#f8fbff!important;}
-  body.page-market .heatCell{border-color:#d8e3f0!important;color:#111827!important;}
-  body.page-market .pill{background:#eaf2ff!important;color:#1d4ed8!important;}
-  body.page-market .pos{color:#059669!important;}
-  body.page-market .neg{color:#dc2626!important;}
-
-  @media(max-width:820px){.multipage-site-nav .inner,.topnav .navin{align-items:flex-start!important;flex-direction:column!important}.multipage-site-nav .links,.topnav .navlinks{width:100%!important;overflow:auto!important;flex-wrap:nowrap!important}.hero h1,body>section.hero h1,body>header.hero h1,body.page-market header h1{font-size:28px!important}}
-</style>
-<!-- unified-category-theme:end -->
 </head>
-<body class="page-home">
+<body>
   <section class="hero">
-    <div class="wrap">
-      <div class="eyebrow">品类复盘中心 · 多页面网站</div>
-      <h1>挡风类目数据复盘总入口</h1>
-      <p class="subtitle">把 ABA 搜索词与细分市场分析、BS & 新品榜分析、硬挡风车型销售市场分析、预算达成分析整合到同一个网站入口。点击下方模块即可进入对应看板。</p>
-    </div>
-  </section>
-  <nav class="topnav">
-    <div class="navin">
-      <div class="brand">Category Review Hub</div>
-      <div class="navlinks">
-        <a href="./index.html">总览首页</a>
-        <a href="./pages/aba-search-analysis.html">类目搜索词分析</a>
-        <a href="./pages/bs-new-release-analysis/index.html">BS & 新品榜分析</a>
-        <a href="./pages/windshield-market-analysis.html">硬挡风市场分析</a>
-        <a href="./pages/budget-achievement-analysis/index.html">预算达成分析</a>
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">升级试做版 · 从看板升级为决策中心</div>
+        <h1>挡风品类复盘决策中心</h1>
+        <p class="subtitle">把搜索需求、市场销售、品牌竞争、榜单新品和预算达成串成一条经营判断链路：先判断需求，再判断承接，再判断竞争，最后落到 Q3-Q4 的动作优先级。</p>
+      </div>
+      <div class="hero-panel">
+        <b>比单页看板更进一步</b>
+        <p>首页先给经营结论和看法，每个子页面再进入明细验证；适合汇报、复盘、讨论和后续更新。</p>
       </div>
     </div>
-  </nav>
+  </section>
+  <nav class="topnav"><div class="navin"><div class="brand">Category Decision Hub</div><div class="navlinks"><a href="./index.html">总览首页</a><a href="./pages/aba-search-analysis.html">类目搜索词</a><a href="./pages/windshield-market-analysis.html">市场分析</a><a href="./pages/budget-achievement-analysis/index.html">预算达成</a><a href="./pages/bs-new-release-analysis/index.html">BS&新品榜</a><a href="./可分享链接.html">分享链接</a></div></div></nav>
   <main>
-    <section class="summary">
-      <div class="mini"><b>4 个看板</b><span>当前已整合搜索、榜单、车型市场和预算达成分析。</span></div>
-      <div class="mini"><b>统一入口</b><span>从首页进入不同页面，避免多个文件分散查找。</span></div>
-      <div class="mini"><b>可继续扩展</b><span>后续可以继续加入价格带、竞品、广告、库存或车型页面。</span></div>
+    <section class="grid kpis">
+      <div class="kpi"><span class="badge b-blue">需求判断</span><b>搜索 → 细分市场</b><span>用 ABA 环比/同比 + 去年 Q3-Q4 趋势判断是真增长还是季节性波动。</span></div>
+      <div class="kpi"><span class="badge b-green">承接判断</span><b>车型 × 价格段</b><span>用市场销量份额、KM 份额和 TOP 品牌份额判断重点机会格子。</span></div>
+      <div class="kpi"><span class="badge b-orange">经营判断</span><b>预算缺口</b><span>联动销量、销售额、回款额、利润额、客单价和费用率，定位差距来源。</span></div>
+      <div class="kpi"><span class="badge b-red">竞争判断</span><b>BS & 新品榜</b><span>补充验证竞品上榜、新品速度和 KM 产品上榜质量。</span></div>
     </section>
 
-    <section class="grid">
-      <article class="card">
-        <h2>类目搜索词分析</h2>
-        <p>查看搜索需求趋势、关键词环比/同比、品牌曝光 → 点击 → 加购 → 购买表现，以及结合 Q3-Q4 前瞻输出的机会点和危险点。</p>
-        <div class="tags"><span class="tag">搜索需求</span><span class="tag">关键词趋势</span><span class="tag">品牌漏斗</span><span class="tag">机会/危险点</span></div>
-        <div class="actions"><a class="btn primary" href="./pages/aba-search-analysis.html">进入看板</a><a class="btn ghost" href="./pages/aba-search-analysis.html#opprisk">查看机会与危险点</a></div>
-      </article>
-
-      <article class="card">
-        <h2>KEMIMOTO 类目BS & 新品榜分析</h2>
-        <p>查看 BS 榜单与新品榜表现，用于补充判断市场竞争、品牌位置、新品机会和细分产品表现。</p>
-        <div class="tags"><span class="tag">BS榜单</span><span class="tag">新品榜</span><span class="tag">品牌表现</span><span class="tag">细分对比</span></div>
-        <div class="actions"><a class="btn primary" href="./pages/bs-new-release-analysis/index.html">进入看板</a></div>
-      </article>
-
-      <article class="card">
-        <h2>硬挡风车型销售市场分析</h2>
-        <p>查看 UTV、高尔夫、Moto 等硬挡风车型维度的销售市场表现，用于补充判断车型机会、产品结构和市场承接方向。</p>
-        <div class="tags"><span class="tag">车型市场</span><span class="tag">销售表现</span><span class="tag">产品结构</span><span class="tag">机会判断</span></div>
-        <div class="actions"><a class="btn primary" href="./pages/windshield-market-analysis.html">进入看板</a></div>
-      </article>
-
-      <article class="card">
-        <h2>预算达成分析看板</h2>
-        <p>查看挡风品类预算达成情况，辅助判断目标完成进度、缺口、增长来源和后续资源投入优先级。</p>
-        <div class="tags"><span class="tag">预算达成</span><span class="tag">目标进度</span><span class="tag">缺口分析</span><span class="tag">资源投入</span></div>
-        <div class="actions"><a class="btn primary" href="./pages/budget-achievement-analysis/index.html">进入看板</a></div>
-      </article>
+    <div class="section-title"><div><h2>推荐阅读路径</h2><p>不是简单堆图表，而是按照经营问题一步步定位。</p></div></div>
+    <section class="grid routes">
+      <article class="route"><div class="num">1</div><h3>需求有没有变强？</h3><p>先看搜索趋势、关键词环比/同比和 Q3-Q4 季节性，避免把旺季正常波动误判成机会。</p></article>
+      <article class="route"><div class="num">2</div><h3>市场机会在哪里？</h3><p>再看车型、价格段、星级和品牌份额，判断 KM 该补哪个车型和价格带。</p></article>
+      <article class="route"><div class="num">3</div><h3>目标差距在哪里？</h3><p>用预算达成页定位销量、销售额、利润额、客单价或费用率的具体缺口。</p></article>
+      <article class="route"><div class="num">4</div><h3>竞品动作怎么变？</h3><p>用 BS 与新品榜验证竞品是否抢榜、上新或在某些细分标签形成优势。</p></article>
     </section>
 
-    <div class="note">
-      建议汇报顺序：先看 ABA 判断需求是否值得做，再看 BS & 新品榜判断竞争和新品机会，再看硬挡风车型市场分析判断产品承接方向，最后结合预算达成分析确定资源投入和动作优先级。
-    </div>
+    <div class="section-title"><div><h2>四个分析页面</h2><p>保留原始数据深度，同时在每页顶部增加“本页怎么读”和“决策用途”。</p></div></div>
+    <section class="grid cards">
+      <article class="card"><h3>类目搜索词分析</h3><p>回答：哪些搜索词是真需求增长、哪些只是淡旺季波动；品牌在曝光、点击、加购、购买链路中哪一环不足。</p><div class="tags"><span class="tag">ABA</span><span class="tag">环比/同比</span><span class="tag">Q3-Q4前瞻</span><span class="tag">机会/危险</span></div><div class="actions"><a class="btn primary" href="./pages/aba-search-analysis.html">进入页面</a><a class="btn ghost" href="./pages/aba-search-analysis.html#opprisk">机会与危险点</a></div></article>
+      <article class="card"><h3>硬挡风车型销售市场分析</h3><p>回答：市场二级车型 × 价格段格局、KM 份额差距、TOP 品牌占比、星级评分风险和重点机会车型。</p><div class="tags"><span class="tag">市场销量份额</span><span class="tag">KM份额</span><span class="tag">TOP品牌</span><span class="tag">评分风险</span></div><div class="actions"><a class="btn primary" href="./pages/windshield-market-analysis.html">进入页面</a></div></article>
+      <article class="card"><h3>挡风品类预算达成分析</h3><p>回答：预算有没有完成，缺口来自哪里；销量、销售额、回款额、利润额、客单价和费用率如何联动。</p><div class="tags"><span class="tag">预算达成</span><span class="tag">缺口排行</span><span class="tag">自动诊断</span><span class="tag">导出</span></div><div class="actions"><a class="btn primary" href="./pages/budget-achievement-analysis/index.html">进入页面</a></div></article>
+      <article class="card"><h3>BS & 新品榜分析</h3><p>回答：KM 和竞品当季上榜质量、新品表现、最佳 BSR、上榜稳定性，以及哪些产品值得重点复盘。</p><div class="tags"><span class="tag">BS榜单</span><span class="tag">新品榜</span><span class="tag">KEMIMOTO产品</span><span class="tag">竞品跟踪</span></div><div class="actions"><a class="btn primary" href="./pages/bs-new-release-analysis/index.html">进入页面</a></div></article>
+    </section>
+
+    <div class="section-title"><div><h2>统一机会 / 风险判断框架</h2><p>解决之前容易出现的“同一词既是机会又是风险”“参考线不一致”“口径不清晰”等问题。</p></div></div>
+    <section class="matrix"><table><thead><tr><th>判断层</th><th>机会点看什么</th><th>危险点看什么</th><th>最终动作</th></tr></thead><tbody><tr><td><b>需求层</b></td><td>ABA 同比增长，且结合去年 Q3-Q4 仍有延续空间。</td><td>搜索上涨只来自旺季或 Q2 高点，Q3-Q4 可能回落。</td><td>决定是否加大投放和备货。</td></tr><tr><td><b>市场层</b></td><td>车型 × 价格段市场销量份额高，KM 份额低或未充分覆盖。</td><td>市场格子变小、TOP 品牌集中度高，KM 进入成本高。</td><td>决定优先车型、价格段和产品结构。</td></tr><tr><td><b>品牌层</b></td><td>KM 点击/加购/购买效率好，但曝光不足，可放大曝光。</td><td>曝光有了但点击、加购或购买承接弱，说明页面或产品力不足。</td><td>决定投放、Listing、价格和评价动作。</td></tr><tr><td><b>经营层</b></td><td>预算缺口小、费用率可控、客单价稳定，适合加资源。</td><td>利润额、回款额、客单价或广告费率拖累，即使销售增长也需谨慎。</td><td>决定资源投入顺序。</td></tr></tbody></table></section>
+
+    <div class="section-title"><div><h2>Q3-Q4 前瞻动作地图</h2><p>把复盘从“解释 Q2”进一步升级成“指导 Q3-Q4”。</p></div></div>
+    <section class="grid two"><div class="action"><h3>优先放大的情况</h3><ul><li>去年 Q3-Q4 仍有搜索高位或同比支撑，不是纯 Q2 旺季波动。</li><li>市场销量份额高，但 KM 在重点价格段份额不足。</li><li>购买份额高于曝光份额，说明转化承接较好，应放大曝光。</li><li>预算缺口可通过销量或客单价改善拉回，而费用率未明显恶化。</li></ul></div><div class="action" style="border-left-color:#dc2626"><h3>需要谨慎的情况</h3><ul><li>搜索同比下滑，且去年 Q3-Q4 进入淡季或回落明显。</li><li>TOP 品牌份额高、价格段竞争集中，KM 需要更强差异化。</li><li>曝光不低但点击/加购/购买份额弱，优先修页面、价格、评价。</li><li>销售增长但利润额、回款额或广告费率恶化，不能只看销售额。</li></ul></div></section>
+
+    <div class="note">试做版说明：这版重点不是改动原始数据，而是把四个看板串成“经营判断链路”。如果你认可这个方向，下一步可以继续把首页的机会 Top3 / 风险 Top3 做成自动读取各页面数据的动态卡片。</div>
   </main>
-  <footer>本地多页面网站 · 打开 index.html 即可访问全部页面。</footer>
+  <div class="footer">挡风品类复盘决策中心 · 本地升级试做版 · 打开 index.html 即可访问全部页面。</div>
 </body>
 </html>
-
-
-
-
-
-
-

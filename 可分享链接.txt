@@ -1,0 +1,18 @@
+﻿挡风品类复盘看板 - 可分享链接
+
+推荐分享：首页
+https://mo-xiaoji.github.io/category-review-dashboard/
+
+类目搜索词分析
+https://mo-xiaoji.github.io/category-review-dashboard/pages/aba-search-analysis.html
+
+硬挡风车型销售市场分析
+https://mo-xiaoji.github.io/category-review-dashboard/pages/windshield-market-analysis.html
+
+挡风品类预算达成分析看板
+https://mo-xiaoji.github.io/category-review-dashboard/pages/budget-achievement-analysis/
+
+BS & 新品榜分析
+https://mo-xiaoji.github.io/category-review-dashboard/pages/bs-new-release-analysis/
+
+说明：把更新好的网页文件上传到 GitHub 仓库根目录后，以上原链接会自动更新。若刚上传后没变化，等待 1-5 分钟或 Ctrl + F5 强制刷新。
